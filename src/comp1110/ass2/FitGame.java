@@ -24,7 +24,35 @@ public class FitGame {
      * @return True if the piece placement is well-formed
      */
     static boolean isPiecePlacementWellFormed(String piecePlacement) {
-        return false; // FIXME Task 2: determine whether a piece placement is well-formed
+
+        if(piecePlacement.length()!=4){return false;}
+
+        // test if the first character is valid descriptor character.
+        switch (String.valueOf(piecePlacement.charAt(0)).toUpperCase()){
+            case "B": case "G": case "I": case "L": case "N": case "O":case "P": case "R": case "S": case "Y":
+                break; default: return false;
+        }
+
+        // test if the second character is between 0 to 9.
+        String secondCharacter = String.valueOf(piecePlacement.charAt(1));
+        switch (secondCharacter){case "0": case "1": case "2": case "3": case "4": case "5":case "6": case "7": case "8": case "9":
+                break; default: return false;
+        }
+
+        // test if the third character is between 0 to 4.
+        String thirdCharacter = String.valueOf(piecePlacement.charAt(2));
+        switch (thirdCharacter){case "0": case "1": case "2": case "3": case "4":
+            break; default: return false;
+        }
+
+        // test if the fourth character in valid orientation N, S, E, W
+        switch(String.valueOf(piecePlacement.charAt(3)).toUpperCase()){
+            case "N": case "E": case "S": case "W":
+                break; default: return false;
+        }
+
+
+        return true; // FIXME Task 2: determine whether a piece placement is well-formed
     }
 
     /**
