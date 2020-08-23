@@ -7,10 +7,7 @@ package comp1110.ass2;
  */
 
 public enum Direction {
-    NORTH('↑'), EAST('→'), SOUTH('↓'), WEST('←');
 
-    final private char symbol;
-
-    Direction(char symbol) {this.symbol = symbol;}
+    NORTH, EAST, SOUTH, WEST;
 
 }
