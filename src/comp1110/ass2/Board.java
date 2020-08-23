@@ -37,6 +37,6 @@ public class Board {
      * judge if all the holes on the board is filled by puzzles
      * @return return true if the board is filled.  Otherwise return false.
      */
-    public boolean ifFinished() { return false; }
+    public boolean ifFinished() { return false;  }
 
 }
