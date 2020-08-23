@@ -1,8 +1,8 @@
 package comp1110.ass2;
 
 /**
- * This enumeration type Comprises the 10 distinct color that representing
- * 10 playing shapes in IQFit game.
+ * This enumeration type represents the 10 distinct color each
+ * representing a distinct playing shape in IQFit game.
  *
  */
 
