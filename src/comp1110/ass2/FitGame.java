@@ -26,6 +26,7 @@ public class FitGame {
      */
     static boolean isPiecePlacementWellFormed(String piecePlacement) {
 
+        // test if the String has four characters.
         if(piecePlacement.length()!=4){return false;}
 
         // test if the first character is valid descriptor character.
