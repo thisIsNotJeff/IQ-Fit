@@ -27,3 +27,5 @@ public class Puzzle {
     public int[][] getPosition(){return position;}
 
 }
+
+
