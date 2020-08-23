@@ -11,7 +11,6 @@ public enum Color {
 
     final private char value;
 
-    Color(char value){ this.value=value;
-    }
+    Color(char value){ this.value=value;}
 
 }
