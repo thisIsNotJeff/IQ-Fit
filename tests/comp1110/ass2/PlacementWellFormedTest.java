@@ -37,6 +37,16 @@ public class PlacementWellFormedTest {
     }
 
     @Test
+    public void correctOrder() {
+        for (int i = 0; i < SOLUTIONS.length; i++) {
+            test(SOLUTIONS[i].placement, true);
+            String wrong = SOLUTIONS[i].placement.substring(SOLUTIONS[i].placement.length() / 2);
+            wrong += SOLUTIONS[i].placement.substring(0, SOLUTIONS[i].placement.length() / 2);
+            test(wrong, false);
+        }
+    }
+
+    @Test
     public void duplicatesA() {
         for (int i = 0; i < 40; i += 4) {
             if (i == 16)

@@ -32,7 +32,7 @@ build:
     - comp1110
   stage: build
   script:
-    - javac -encoding ISO-8859-1 $JAVAFX_OPTIONS -cp $CP src/comp1110/ass2/*.java src/comp1110/ass2/*/*.java
+    - javac -encoding utf-8 $JAVAFX_OPTIONS -cp $CP src/comp1110/ass2/*.java src/comp1110/ass2/*/*.java
   artifacts:
     paths:
       - src/comp1110/ass2/*.class
