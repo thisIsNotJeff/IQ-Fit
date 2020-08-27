@@ -20,7 +20,7 @@ public class Board {
      * @return return true if there is not overlap or the puzzle will not be outside
      * of the board. Otherwise return false.
      */
-    public boolean canBePut(Puzzle puzzle, int[] position) {
+    public boolean canBePut(Puzzlepieces puzzle, int[] position) {
         return false;
     }
 

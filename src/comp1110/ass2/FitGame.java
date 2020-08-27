@@ -135,8 +135,875 @@ public class FitGame {
      * @param placement A placement string
      * @return True if the placement sequence is valid
      */
-    public static boolean isPlacementValid(String placement) {
-        return false; // FIXME Task 5: determine whether a placement string is valid
+    public static boolean isPlacementValid(String placement) { // FIXME Task 5: determine whether a placement string is valid
+        int[][] pos = new int[10][5];
+        int i = 0;
+        int j = 0;
+        int col;
+        int row;
+        while(i < placement.length()) {
+            col = placement.charAt(i + 1) - '0';
+            row = placement.charAt(i + 2) - '0';
+            if((col < 0)||(col > 9)|(row < 0)||(row > 4)) return false;
+            if((placement.charAt(i + 3) != 'N')&&(placement.charAt(i + 3) != 'E')&&
+               (placement.charAt(i + 3) != 'S')&&(placement.charAt(i + 3) != 'W')) return false;
+            else if(placement.charAt(i) == 'b') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 3][row] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'B') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 3][row] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'g') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row + 1] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'G') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'i') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'I') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'l') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 2][row] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'L') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'n') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row + 1] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'N') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 7)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 2)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'o') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 3][row] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'O') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'p') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row + 1] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'P') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 3][row] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row + 2] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'r') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 3][row] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'R') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 3][row] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 's') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 3][row] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'S') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'y') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 3][row] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row] += 1;
+                    }
+                }
+            }
+            else if(placement.charAt(i) == 'Y') {
+                if(placement.charAt(i + 3) == 'N') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 2][row] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'E') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row + 2] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 1][row + 2] += 1;
+                        pos[col + 1][row + 3] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'S') {
+                    if((col > 6)||(row > 3)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                        pos[col + 2][row + 1] += 1;
+                        pos[col + 3][row + 1] += 1;
+                    }
+                }
+                else if(placement.charAt(i + 3) == 'W') {
+                    if((col > 8)||(row > 1)) return false;
+                    else {
+                        pos[col][row] += 1;
+                        pos[col][row + 1] += 1;
+                        pos[col][row + 2] += 1;
+                        pos[col][row + 3] += 1;
+                        pos[col + 1][row] += 1;
+                        pos[col + 1][row + 1] += 1;
+                    }
+                }
+            }
+            else return false;
+            i += 4;
+        }
+        for(i = 0; i < 10; i++) {
+            for(j = 0; j < 5; j++) {
+                if(pos[i][j] > 1) return false;
+            }
+        }
+        return true;
     }
 
     /**

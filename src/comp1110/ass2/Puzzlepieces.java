@@ -1,6 +1,6 @@
 package comp1110.ass2;
 
-public class Puzzle {
+public class Puzzlepieces {
     public Direction direction;
     public Color color;
     public int[][] position;
@@ -11,7 +11,7 @@ public class Puzzle {
      * @param color the color used to represent this puzzle piece
      * @param position the position of this puzzle is placed
      */
-    public Puzzle(Direction direction, Color color, int[][] position){
+    public Puzzlepieces(Direction direction, Color color, int[][] position){
         this.direction=direction;
         this.color=color;
         this.position=position;
