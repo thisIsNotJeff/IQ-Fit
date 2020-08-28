@@ -8,6 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
@@ -26,8 +28,10 @@ public class Viewer extends Application {
     private static final int VIEWER_HEIGHT = 480;
 
     private static final String URI_BASE = "assets/";
+    private static final String BASEBOARD_URI = Viewer.class.getResource(URI_BASE + "board.png").toString();
 
     private final Group root = new Group();
+    private Group board = new Group();
     private final Group controls = new Group();
     private TextField textField;
 
@@ -70,9 +74,28 @@ public class Viewer extends Application {
 
         root.getChildren().add(controls);
 
+        root.getChildren().add(board);
+
+        makeBord();
+
         makeControls();
+
 
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public void makeBord() {
+        board.getChildren().clear();
+        ImageView baseboard = new ImageView();
+
+        baseboard.setImage(new Image(BASEBOARD_URI));
+        baseboard.setFitWidth(400);
+        baseboard.setFitHeight(200);
+        baseboard.setLayoutX(150);
+
+        board.getChildren().add(baseboard);
+
+        board.toBack();
     }
 }
