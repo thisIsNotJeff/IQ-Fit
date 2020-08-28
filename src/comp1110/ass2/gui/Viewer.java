@@ -92,9 +92,9 @@ public class Viewer extends Application {
         ImageView baseboard = new ImageView();
 
         baseboard.setImage(new Image(BASEBOARD_URI));
-        baseboard.setFitWidth(550);
+        baseboard.setFitWidth(560);
         baseboard.setFitHeight(300);
-        baseboard.setLayoutX(85);
+        baseboard.setLayoutX(80);
 
         board.getChildren().add(baseboard);
 
@@ -106,10 +106,10 @@ public class Viewer extends Application {
         ImageView pieces = new ImageView();
 
         pieces.setImage(new Image(GREEN));
-        pieces.setFitWidth(140);
-        pieces.setFitHeight(100);
-        pieces.setX(125);
-        pieces.setY(21);
+        pieces.setFitWidth(145);
+        pieces.setFitHeight(95);
+        pieces.setX(119);
+        pieces.setY(23.5);
 
         board.getChildren().add(pieces);
 
