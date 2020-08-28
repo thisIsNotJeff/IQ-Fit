@@ -30,8 +30,10 @@ public class Viewer extends Application {
     private static final String URI_BASE = "assets/";
     private static final String BASEBOARD_URI = Viewer.class.getResource(URI_BASE + "board.png").toString();
 
+    private static final String GREEN = Viewer.class.getResource(URI_BASE + "G1.png").toString();
+
     private final Group root = new Group();
-    private Group board = new Group();
+    private final Group board = new Group();
     private final Group controls = new Group();
     private TextField textField;
 
@@ -73,29 +75,44 @@ public class Viewer extends Application {
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
 
         root.getChildren().add(controls);
-
         root.getChildren().add(board);
 
         makeBord();
-
+        placePieces();
         makeControls();
-
 
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
+    /**
+     * Construct a basic board for pieces to be placed.
+     */
     public void makeBord() {
-        board.getChildren().clear();
+        //board.getChildren().clear();
         ImageView baseboard = new ImageView();
 
         baseboard.setImage(new Image(BASEBOARD_URI));
-        baseboard.setFitWidth(400);
-        baseboard.setFitHeight(200);
-        baseboard.setLayoutX(150);
+        baseboard.setFitWidth(550);
+        baseboard.setFitHeight(300);
+        baseboard.setLayoutX(85);
 
         board.getChildren().add(baseboard);
 
         board.toBack();
+    }
+
+
+    public void placePieces() {
+        ImageView pieces = new ImageView();
+
+        pieces.setImage(new Image(GREEN));
+        pieces.setFitWidth(140);
+        pieces.setFitHeight(100);
+        pieces.setX(125);
+        pieces.setY(21);
+
+        board.getChildren().add(pieces);
+
+
     }
 }
