@@ -77,7 +77,7 @@ public class Viewer extends Application {
                     (t == 'P')||(t == 'r')||(t == 'R')||(t == 's')||(t == 'S')||(t == 'y')||(t == 'Y')) {
                 if(Character.isLowerCase(t)) num = "1";
                 else num = "2";
-                puzzle[n] = new Image("file:C:\\Users\\carrot\\IdeaProjects\\comp1110-ass2-tue15g\\src\\comp1110\\ass2\\gui\\assets\\" + String.valueOf(t) + num + ".png");
+                puzzle[n] = new Image("file:src/comp1110/ass2/gui/assets/" + String.valueOf(t) + num + ".png");
                 pview[n] = new ImageView();
                 pview[n].setImage(puzzle[n]);
                 pview[n].setFitWidth(235);
@@ -145,44 +145,10 @@ public class Viewer extends Application {
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
 
         root.getChildren().add(controls);
-        root.getChildren().add(board);
 
-        makeBord();
-        placePieces();
         makeControls();
 
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
-    /**
-     * Construct a basic board for pieces to be placed.
-     */
-    public void makeBord() {
-        //board.getChildren().clear();
-        ImageView baseboard = new ImageView();
-
-        baseboard.setImage(new Image(BASEBOARD_URI));
-        baseboard.setFitWidth(560);
-        baseboard.setFitHeight(300);
-        baseboard.setLayoutX(80);
-
-        board.getChildren().add(baseboard);
-
-        board.toBack();
-    }
-
-
-    public void placePieces() {
-        ImageView pieces = new ImageView();
-
-        pieces.setImage(new Image(GREEN));
-        pieces.setFitWidth(145);
-        pieces.setFitHeight(95);
-        pieces.setX(119);
-        pieces.setY(23.5);
-
-        board.getChildren().add(pieces);
-
-
     }
 }
