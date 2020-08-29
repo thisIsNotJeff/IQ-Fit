@@ -19,8 +19,8 @@ declaration: >-
 # Sign *your* name and uids here. (Remove entries if you have fewer
 # than three members.)
 signatures:
-  - name:
-    uid:
+  - name: Qinrui Cheng
+    uid: u7133046
   - name: Boyang Gao
     uid: u7175363
   - name: Yuxuan Hu
