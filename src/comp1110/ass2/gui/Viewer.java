@@ -56,7 +56,7 @@ public class Viewer extends Application {
         //distance between holes: 60
         //2*3 puzzlepiece rotate 90: x - 30  y + 30
         //2*4 puzzlepiece rotate 90: x - 60  y - 60
-        Image image = new Image("file:C:\\Users\\carrot\\IdeaProjects\\comp1110-ass2-tue15g\\src\\comp1110\\ass2\\gui\\assets\\board.png");
+        Image image = new Image("file:src/comp1110/ass2/gui/assets/board.png");
         ImageView imageView = new ImageView();
         imageView.setImage(image);
         imageView.setFitWidth(700);
