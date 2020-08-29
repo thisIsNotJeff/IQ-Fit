@@ -34,8 +34,12 @@ public class Viewer extends Application {
     private static final int VIEWER_HEIGHT = 480;
 
     private static final String URI_BASE = "assets/";
+    private static final String BASEBOARD_URI = Viewer.class.getResource(URI_BASE + "board.png").toString();
+
+    private static final String GREEN = Viewer.class.getResource(URI_BASE + "G1.png").toString();
 
     private final Group root = new Group();
+    private final Group board = new Group();
     private final Group controls = new Group();
     private TextField textField;
 
@@ -141,10 +145,44 @@ public class Viewer extends Application {
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
 
         root.getChildren().add(controls);
+        root.getChildren().add(board);
 
+        makeBord();
+        placePieces();
         makeControls();
 
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+    /**
+     * Construct a basic board for pieces to be placed.
+     */
+    public void makeBord() {
+        //board.getChildren().clear();
+        ImageView baseboard = new ImageView();
+
+        baseboard.setImage(new Image(BASEBOARD_URI));
+        baseboard.setFitWidth(560);
+        baseboard.setFitHeight(300);
+        baseboard.setLayoutX(80);
+
+        board.getChildren().add(baseboard);
+
+        board.toBack();
+    }
+
+
+    public void placePieces() {
+        ImageView pieces = new ImageView();
+
+        pieces.setImage(new Image(GREEN));
+        pieces.setFitWidth(145);
+        pieces.setFitHeight(95);
+        pieces.setX(119);
+        pieces.setY(23.5);
+
+        board.getChildren().add(pieces);
+
+
     }
 }
