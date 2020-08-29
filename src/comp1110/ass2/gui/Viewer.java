@@ -96,7 +96,7 @@ public class Viewer extends Application {
             else {
                 if(Character.isLowerCase(t)) num = "1";
                 else num = "2";
-                puzzle[n] = new Image("file:C:\\Users\\carrot\\IdeaProjects\\comp1110-ass2-tue15g\\src\\comp1110\\ass2\\gui\\assets\\" + String.valueOf(t) + num + ".png");
+                puzzle[n] = new Image("file:src/comp1110/ass2/gui/assets/" + String.valueOf(t) + num + ".png");
                 pview[n] = new ImageView();
                 pview[n].setImage(puzzle[n]);
                 pview[n].setFitWidth(175);
