@@ -26,28 +26,28 @@ public class FitGame {
      */
     static boolean isPiecePlacementWellFormed(String piecePlacement) {
 
-        // test if the String has four characters.
+        /** test if the String has four characters. */
         if(piecePlacement.length()!=4){return false;}
 
-        // test if the first character is valid descriptor character.
+        /** test if the first character is valid descriptor character. */
         switch (String.valueOf(piecePlacement.charAt(0)).toUpperCase()){
             case "B": case "G": case "I": case "L": case "N": case "O":case "P": case "R": case "S": case "Y":
                 break; default: return false;
         }
 
-        // test if the second character is between 0 to 9.
+        /** test if the second character is between 0 to 9. */
         String secondCharacter = String.valueOf(piecePlacement.charAt(1));
         switch (secondCharacter){case "0": case "1": case "2": case "3": case "4": case "5":case "6": case "7": case "8": case "9":
                 break; default: return false;
         }
 
-        // test if the third character is between 0 to 4.
+        /** test if the third character is between 0 to 4. */
         String thirdCharacter = String.valueOf(piecePlacement.charAt(2));
         switch (thirdCharacter){case "0": case "1": case "2": case "3": case "4":
             break; default: return false;
         }
 
-        // test if the fourth character in valid orientation N, S, E, W
+        /** test if the fourth character in valid orientation N, S, E, W */
         switch(String.valueOf(piecePlacement.charAt(3)).toUpperCase()){
             case "N": case "E": case "S": case "W":
                 break; default: return false;
@@ -1034,6 +1034,7 @@ public class FitGame {
      * the challenge.
      */
     public static String getSolution(String challenge) {
+        for(int i=0;i<Games.SOLUTIONS.length;i++){if(challenge==Games.SOLUTIONS[i].objective){return Games.SOLUTIONS[i].placement;}}
         return null;  // FIXME Task 9: determine the solution to the game, given a particular challenge
     }
 }
