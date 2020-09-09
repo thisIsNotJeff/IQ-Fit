@@ -8,6 +8,12 @@ package comp1110.ass2;
 
 public enum Direction {
 
-    NORTH, EAST, SOUTH, WEST;
+    NORTH('N'), EAST('E'), SOUTH('S'), WEST('W');
+
+    public char value;
+
+    Direction(char value) {
+        this.value = value;
+    }
 
 }

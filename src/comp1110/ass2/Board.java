@@ -2,7 +2,7 @@ package comp1110.ass2;
 
 public class Board {
     Games game;
-    public int[][] position = new int[10][5];
+    public int[][] position = new int[5][10];
 
     /**
      * start a new game with the given difficulty
@@ -12,6 +12,9 @@ public class Board {
 
     }
 
+
+
+
     /**
      * given a puzzle and a position represented by an array,
      * judge if the puzzle can be put in the position
@@ -20,7 +23,7 @@ public class Board {
      * @return return true if there is not overlap or the puzzle will not be outside
      * of the board. Otherwise return false.
      */
-    public boolean canBePut(Puzzlepieces puzzle, int[] position) {
+    public boolean canBePut(puzzlePieces puzzle, int[] position) {
         return false;
     }
 
