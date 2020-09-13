@@ -156,34 +156,59 @@ public class FitGame {
      * @return A set of all viable piece placements, or null if there are none.
      */
     static Set<String> getViablePiecePlacements(String placement, int col, int row) {
+        System.out.println("placement is "+placement);
 
         Set<String> result = new HashSet<>();
 
         Integer columns = col;
         Integer rows = row;
+        String newPiece;
+
+
+        Character[] usedColor = getUsedColor(placement);
+
         if (isPlacementValid(sortStringPlacement(placement+'*' + columns.toString() + rows.toString() + 'W'))) {
+
             for (Color c : Color.values()) {
-                for (Direction d : Direction.values()) {
-                    for (Integer y = 0; y < 5; y++) {
-                        for (Integer x = 0; x < 10; x++) {
-                            String newPiece = c.value + x.toString() + y.toString() + d.value;
-                            if (isPlacementValid(sortStringPlacement(placement + newPiece))) {
-                                String newPlacement =sortStringPlacement(placement + newPiece + '*' + columns.toString() + rows.toString() + 'W');
-                                if (!isPlacementValid(newPlacement)) {
-                                    if (c != Color.TEST) result.add(newPiece);
+                if (c == Color.TEST) continue;
+                if (placement.length() == 0||!Arrays.asList(usedColor).contains(Character.toLowerCase(c.value))) {
+                    for (Direction d : Direction.values()) {
+                        for (Integer y = 0; y < 5; y++) {
+                            for (Integer x = 0; x < 10; x++) {
+                                newPiece = c.value + x.toString() + y.toString() + d.value;
+                                var pair = validityOccupation(sortStringPlacement(placement+newPiece));
+                                var occupationArray = pair.getValue();
+                                var valid = pair.getKey();
+                                if (valid) {
+                                    if (occupationArray[col][row] == 1) {
+                                        result.add(newPiece);
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        } else return null;
-
-
+        }
 
         if (result.size() == 0) return null;
         else return result;
 
+    }
+
+
+    /**
+     * Given a placement string, return all the used color in the placement.
+     *
+     * @param placement A string of placement.
+     * @return An array of used color.
+     */
+    public static Character[] getUsedColor(String placement) {
+        ArrayList<Character> used = new ArrayList<>();
+        for (int i = 0; i < placement.length(); i = i+4) {
+            used.add(Character.toLowerCase(placement.charAt(i)));
+        }
+        return used.toArray(new Character[0]);
     }
 
 
@@ -225,12 +250,9 @@ public class FitGame {
                 if ((charDirection != 'N') && (charDirection != 'E') &&
                         (charDirection != 'S') && (charDirection != 'W')) return b;
 
-//            for (Direction d : Direction.values()) {
-//                if (charDirection != d.value && d == Direction.WEST)
-//                    return b;
-//            }
 
                 if (charColour == 'b') {
+
                     if (charDirection == 'N') {
                         if ((column > 6) || (row > 3)) return b;
                         else {
@@ -269,6 +291,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'B') {
+
                     if (charDirection == 'N') {
                         if ((column > 6) || (row > 3)) return b;
                         else {
@@ -311,6 +334,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'g') {
+
                     if (charDirection == 'N') {
                         if ((column > 7) || (row > 3)) return b;
                         else {
@@ -345,6 +369,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'G') {
+
                     if (charDirection == 'N') {
                         if ((column > 7) || (row > 3)) return b;
                         else {
@@ -383,6 +408,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'i') {
+
                     if (charDirection == 'N') {
                         if ((column > 7) || (row > 3)) return b;
                         else {
@@ -417,6 +443,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'I') {
+
                     if (charDirection == 'N') {
                         if ((column > 7) || (row > 3)) return b;
                         else {
@@ -455,6 +482,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'l') {
+
                     if (charDirection == 'N') {
                         if ((column > 7) || (row > 3)) return b;
                         else {
@@ -489,6 +517,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'L') {
+
                     if (charDirection == 'N') {
                         if ((column > 7) || (row > 3)) return b;
                         else {
@@ -527,6 +556,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'n') {
+
                     if (charDirection == 'N') {
                         if ((column > 7) || (row > 3)) return b;
                         else {
@@ -561,6 +591,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'N') {
+
                     if (charDirection == 'N') {
                         if ((column > 7) || (row > 3)) return b;
                         else {
@@ -599,6 +630,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'o') {
+
                     if (charDirection == 'N') {
                         if ((column > 6) || (row > 3)) return b;
                         else {
@@ -637,6 +669,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'O') {
+
                     if (charDirection == 'N') {
                         if ((column > 6) || (row > 3)) return b;
                         else {
@@ -679,6 +712,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'p') {
+
                     if (charDirection == 'N') {
                         if ((column > 6) || (row > 3)) return b;
                         else {
@@ -717,6 +751,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'P') {
+
                     if (charDirection == 'N') {
                         if ((column > 6) || (row > 3)) return b;
                         else {
@@ -759,6 +794,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'r') {
+
                     if (charDirection == 'N') {
                         if ((column > 6) || (row > 3)) return b;
                         else {
@@ -797,6 +833,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'R') {
+
                     if (charDirection == 'N') {
                         if ((column > 6) || (row > 3)) return b;
                         else {
@@ -839,6 +876,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 's') {
+
                     if (charDirection == 'N') {
                         if ((column > 6) || (row > 3)) return b;
                         else {
@@ -877,6 +915,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'S') {
+
                     if (charDirection == 'N') {
                         if ((column > 6) || (row > 3)) return b;
                         else {
@@ -919,6 +958,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'y') {
+
                     if (charDirection == 'N') {
                         if ((column > 6) || (row > 3)) return b;
                         else {
@@ -957,6 +997,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == 'Y') {
+
                     if (charDirection == 'N') {
                         if ((column > 6) || (row > 3)) return b;
                         else {
@@ -999,6 +1040,7 @@ public class FitGame {
                         }
                     }
                 } else if (charColour == '*') {
+
                     occupationArray[column][row] += 1;
                 } else return b;
             }
@@ -1032,6 +1074,7 @@ public class FitGame {
         for (String s : grouped) sorted += s;
         return sorted;
     }
+
 
 
 
