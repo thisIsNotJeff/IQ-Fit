@@ -23,7 +23,8 @@ declaration: >-
 # (or remove it altogether if you haven't collaborated with anyone)
 collaboration:
   - name: Yuxuan Hu
-    comment: method validityOccupation.
+    comment: >- 
+    method validityOccupation was written with the help of the original code of isPlacementValid(String placement).
 
 # Use this to list any code that you used that you did not write,
 # aside from code provided by the lecturer.  Provide a comment
