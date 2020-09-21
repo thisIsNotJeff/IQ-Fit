@@ -155,7 +155,6 @@ public class FitGame {
      * @return A set of all viable piece placements, or null if there are none.
      */
     static Set<String> getViablePiecePlacements(String placement, int col, int row) {
-        System.out.println("placement is "+placement);
 
         Set<String> result = new HashSet<>();
 
