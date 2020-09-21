@@ -42,7 +42,6 @@ public class Viewer extends Application {
     private final Group board = new Group();
     private final Group controls = new Group();
     private TextField textField;
-
     /**
      * Draw a placement in the window, removing any previously drawn one
      *
