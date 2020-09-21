@@ -23,7 +23,7 @@ declaration: >-
 # (or remove it altogether if you haven't collaborated with anyone)
 collaboration:
   - name: Yuxuan Hu
-    comment: >- function-validityOccupation(String placement).
+    comment: >- function validityOccupation.
 
 # Use this to list any code that you used that you did not write,
 # aside from code provided by the lecturer.  Provide a comment
