@@ -4,4 +4,4 @@
 
 For Deliverable D2D, I contributed the following new statements of original code:
 
-- Completed the
+Added some function in [task 7](https://gitlab.cecs.anu.edu.au/u7133046/comp1110-ass2-tue15g/-/blob/master/src/comp1110/ass2/gui/Board.java#L20-145)to show and flip puzzle pieces
