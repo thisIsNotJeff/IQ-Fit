@@ -12,9 +12,7 @@
 declaration: >-
   I declare that everything I have submitted for stage D of this assignment
   and all stages before it is entirely my own work, with the following
-  exceptions: Major part of the function validityOccupation(String placement) is written by member u7167529 in isPlacementValid(String placement),
-  in order to have better performance of my code, I modified it into function validityOccupation(String placement) so that it can have muti-usages.
-
+  exceptions: 
 
 # Use this to list names of people who you collaborated with, and a
 # comment about what you collaborated on.
@@ -25,29 +23,6 @@ collaboration:
   - name: Yuxuan Hu
     comment: >-
     Method validityOccupation was modified from the original code of method isPlacementValid(String placement).
-
-# Use this to list any code that you used that you did not write,
-# aside from code provided by the lecturer.  Provide a comment
-# explaining your use and the URL to that code and the licence for
-# that code
-#
-# Add as many "url+licence+comment" entries as necessary
-# (or remove it altogether if you haven't used any external code)
-code:
-  - comment:
-    url:
-    licence:
-
-# Use this to list any assets (artwork, sound, etc) that you used.
-# Provide a comment explaining your use of that asset and the URL
-# and license for the asset
-#
-# Add as many "url+licence+comment" entries as necessary
-# (or remove it altogether if you haven't used any external assets)
-assets:
-  - comment:
-    url:
-    licence:
 
 
 # sign *your* name and uid here
