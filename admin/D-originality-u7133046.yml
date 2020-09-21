@@ -21,8 +21,8 @@ declaration: >-
 # (or remove it altogether if you haven't collaborated with anyone)
 collaboration:
   - name: Yuxuan Hu
-    comment: >-
-    Method validityOccupation was modified from the original code of method isPlacementValid(String placement).
+    comment: Method validityOccupation was modified from the original code of method isPlacementValid(String placement).
+    
 
 
 # sign *your* name and uid here
