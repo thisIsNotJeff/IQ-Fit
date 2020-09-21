@@ -12,7 +12,8 @@
 declaration: >-
   I declare that everything I have submitted for stage D of this assignment
   and all stages before it is entirely my own work, with the following
-  exceptions:
+  exceptions: Major part of the function validityOccupation(String placement) is written by member u7167529 in isPlacementValid(String placement),
+  in order to have better performance of my code, I modified it into function validityOccupation(String placement) so that it can have muti-usages.
 
 
 # Use this to list names of people who you collaborated with, and a
@@ -21,8 +22,8 @@ declaration: >-
 # Add as many "name+comment" entries as necessary
 # (or remove it altogether if you haven't collaborated with anyone)
 collaboration:
-  - name:
-    comment: >-
+  - name: Yuxuan Hu
+    comment: >- function validityOccupation(String placement).
 
 # Use this to list any code that you used that you did not write,
 # aside from code provided by the lecturer.  Provide a comment
@@ -49,5 +50,5 @@ assets:
 
 
 # sign *your* name and uid here
-name:
-uid:
+name: Qinrui Cheng
+uid: u7133046
