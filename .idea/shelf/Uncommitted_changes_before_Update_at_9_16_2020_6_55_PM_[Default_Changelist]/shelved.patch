@@ -1,0 +1,1933 @@
+Index: src/comp1110/ass2/FitGame.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package comp1110.ass2;\r\n\r\nimport javafx.util.Pair;\r\n\r\nimport java.util.*;\r\n\r\n/**\r\n * This class provides the text interface for the IQ Fit Game\r\n * <p>\r\n * The game is based directly on Smart Games' IQ-Fit game\r\n * (https://www.smartgames.eu/uk/one-player-games/iq-fit)\r\n */\r\npublic class FitGame {\r\n\r\n    /**\r\n     * Determine whether a piece placement is well-formed according to the\r\n     * following criteria:\r\n     * - it consists of exactly four characters\r\n     * - the first character is a valid piece descriptor character (b, B, g, G, ... y, Y)\r\n     * - the second character is in the range 0 .. 9 (column)\r\n     * - the third character is in the range 0 .. 4 (row)\r\n     * - the fourth character is in valid orientation N, S, E, W\r\n     *\r\n     * @param piecePlacement A string describing a piece placement\r\n     * @return True if the piece placement is well-formed\r\n     */\r\n    static boolean isPiecePlacementWellFormed(String piecePlacement) {\r\n\r\n        /** test if the String has four characters. */\r\n        if(piecePlacement.length()!=4){return false;}\r\n\r\n        /** test if the first character is valid descriptor character. */\r\n        switch (String.valueOf(piecePlacement.charAt(0)).toUpperCase()){\r\n            case \"B\": case \"G\": case \"I\": case \"L\": case \"N\": case \"O\":case \"P\": case \"R\": case \"S\": case \"Y\": case \"*\":\r\n                break; default: return false;\r\n        }\r\n\r\n        /** test if the second character is between 0 to 9. */\r\n        String secondCharacter = String.valueOf(piecePlacement.charAt(1));\r\n        switch (secondCharacter){case \"0\": case \"1\": case \"2\": case \"3\": case \"4\": case \"5\":case \"6\": case \"7\": case \"8\": case \"9\":\r\n                break; default: return false;\r\n        }\r\n\r\n        /** test if the third character is between 0 to 4. */\r\n        String thirdCharacter = String.valueOf(piecePlacement.charAt(2));\r\n        switch (thirdCharacter){case \"0\": case \"1\": case \"2\": case \"3\": case \"4\":\r\n            break; default: return false;\r\n        }\r\n\r\n        /** test if the fourth character in valid orientation N, S, E, W */\r\n        switch(String.valueOf(piecePlacement.charAt(3)).toUpperCase()){\r\n            case \"N\": case \"E\": case \"S\": case \"W\":\r\n                break; default: return false;\r\n        }\r\n\r\n\r\n        return true; // FIXME Task 2: determine whether a piece placement is well-formed\r\n    }\r\n\r\n    /**\r\n     * Determine whether a placement string is well-formed:\r\n     * - it consists of exactly N four-character piece placements (where N = 1 .. 10);\r\n     * - each piece placement is well-formed\r\n     * - no shape appears more than once in the placement\r\n     * - the pieces are ordered correctly within the string\r\n     *\r\n     * @param placement A string describing a placement of one or more pieces\r\n     * @return True if the placement is well-formed\r\n     */\r\n    public static boolean isPlacementWellFormed(String placement) {\r\n        boolean flag = true;\r\n\r\n        // check if input satisfies condition 1.\r\n        if (placement.length() % 4 == 0\r\n                && placement.length() >= 4\r\n                && placement.length() <= 40) {\r\n\r\n            ArrayList<String> grouped = new ArrayList<>();\r\n\r\n            // group input String as an ArrayList of 4 chars as it's element.\r\n            for (int i = 0; i < placement.length(); i++) {\r\n                grouped.add(placement.substring(i,i+4));\r\n                i = i + 3;\r\n            }\r\n            // check if the input satisfies condition 2.\r\n            for (String s : grouped) {\r\n                if (!isPiecePlacementWellFormed(s)) {\r\n                    flag = false;\r\n                    break;\r\n                }\r\n            }\r\n\r\n            if (flag) {\r\n                StringBuilder shapes = new StringBuilder();\r\n                // flatten the ArrayList into a String which only preserves shapes from the input.\r\n                for (String s : grouped) {\r\n                    shapes.append(s.toLowerCase().charAt(0));\r\n                }\r\n\r\n                // check if the input satisfies condition 3.\r\n                if (shapes.chars().distinct().count() == shapes.length()) {\r\n\r\n                    char[] unsortedShapes = shapes.toString().toLowerCase().toCharArray();\r\n                    //sort the array of shapes according to the alphabetical order.\r\n                    Arrays.sort(unsortedShapes);\r\n\r\n                    StringBuilder sortedShape = new StringBuilder();\r\n\r\n                    for (char c : unsortedShapes) sortedShape.append(c);\r\n                    //check if the input satisfies the last condition.\r\n                    if (!shapes.toString().toLowerCase().equals(sortedShape.toString())) {\r\n                        flag = false;\r\n                    }\r\n\r\n                } else flag = false;\r\n            }\r\n        } else flag = false;\r\n\r\n        return flag;\r\n    }\r\n\r\n\r\n\r\n\r\n    /**\r\n     * Determine whether a placement string is valid.\r\n     *\r\n     * To be valid, the placement string must be:\r\n     * - well-formed, and\r\n     * - each piece placement must be a valid placement according to the\r\n     *   rules of the game:\r\n     *   - pieces must be entirely on the board\r\n     *   - pieces must not overlap each other\r\n     *\r\n     * @param placement A placement string\r\n     * @return True if the placement sequence is valid\r\n     */\r\n    public static boolean isPlacementValid(String placement) {\r\n        return validityOccupation(placement).getKey();\r\n    }\r\n\r\n    /**\r\n     * Given a string describing a placement of pieces, and a location\r\n     * that must be covered by the next move, return a set of all\r\n     * possible next viable piece placements which cover the location.\r\n     *\r\n     * For a piece placement to be viable it must:\r\n     *  - be a well formed piece placement\r\n     *  - be a piece that is not already placed\r\n     *  - not overlap a piece that is already placed\r\n     *  - cover the location\r\n     *\r\n     * @param placement A starting placement string\r\n     * @param col      The location's column.\r\n     * @param row      The location's row.\r\n     * @return A set of all viable piece placements, or null if there are none.\r\n     */\r\n    static Set<String> getViablePiecePlacements(String placement, int col, int row) {\r\n\r\n        Set<String> result = new HashSet<>();\r\n\r\n        Integer columns = col;\r\n        Integer rows = row;\r\n        if (isPlacementValid(sortStringPlacement(placement+'*' + columns.toString() + rows.toString() + 'W'))) {\r\n            for (Color c : Color.values()) {\r\n                for (Direction d : Direction.values()) {\r\n                    for (Integer y = 0; y < 5; y++) {\r\n                        for (Integer x = 0; x < 10; x++) {\r\n                            String newPiece = c.value + x.toString() + y.toString() + d.value;\r\n                            if (isPlacementValid(sortStringPlacement(placement + newPiece))) {\r\n                                String newPlacement =sortStringPlacement(placement + newPiece + '*' + columns.toString() + rows.toString() + 'W');\r\n                                if (!isPlacementValid(newPlacement)) {\r\n                                    if (c != Color.TEST) result.add(newPiece);\r\n                                }\r\n                            }\r\n                        }\r\n                    }\r\n                }\r\n            }\r\n        } else return null;\r\n\r\n\r\n\r\n        if (result.size() == 0) return null;\r\n        else return result;\r\n\r\n    }\r\n\r\n\r\n    /**\r\n     * Given a placement string, return a pair contains the validity of the placement according to the rule of the game and\r\n     * an int array of array illustrate the real occupation of each pieces in the placement string.\r\n     * into a List of Pairs.\r\n     *\r\n     * @param placement A string of placement.\r\n     * @return A Pair of contains the validity of placement and the occupation int array of array.\r\n     */\r\n    public static Pair<Boolean, int[][]> validityOccupation(String placement) {\r\n\r\n        //create a container for pieces parsed from string\r\n        ArrayList<String> pieces = new ArrayList<>();\r\n\r\n        for (int i = 0; i < placement.length(); i = i + 4) {\r\n            pieces.add(placement.substring(i, i + 4));\r\n        }\r\n\r\n\r\n        //create a int array of array to illustrate the real occupation of pieces.\r\n        int[][] occupationArray = new int[10][5];\r\n\r\n        Pair<Boolean, int[][]> b = new Pair<>(false, null);\r\n\r\n        if (!isPlacementWellFormed(placement)) return b;\r\n        else {\r\n            for (String piece : pieces) {\r\n\r\n                int row = Character.getNumericValue(piece.charAt(2));\r\n                int column = Character.getNumericValue(piece.charAt(1));\r\n                char charColour = piece.charAt(0);\r\n                char charDirection = piece.charAt(3);\r\n\r\n\r\n                if ((column < 0) || (column > 9) || (row < 0) || (row > 4)) return b;\r\n\r\n                if ((charDirection != 'N') && (charDirection != 'E') &&\r\n                        (charDirection != 'S') && (charDirection != 'W')) return b;\r\n\r\n//            for (Direction d : Direction.values()) {\r\n//                if (charDirection != d.value && d == Direction.WEST)\r\n//                    return b;\r\n//            }\r\n\r\n                if (charColour == 'b') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'B') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'g') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'G') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'i') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'I') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'l') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'L') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'n') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'N') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 7) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 2)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'o') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'O') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'p') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'P') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'r') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'R') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 's') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'S') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'y') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == 'Y') {\r\n                    if (charDirection == 'N') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 2][row] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else if (charDirection == 'E') {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 1][row + 2] += 1;\r\n                            occupationArray[column + 1][row + 3] += 1;\r\n                        }\r\n                    } else if (charDirection == 'S') {\r\n                        if ((column > 6) || (row > 3)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                            occupationArray[column + 2][row + 1] += 1;\r\n                            occupationArray[column + 3][row + 1] += 1;\r\n                        }\r\n                    } else {\r\n                        if ((column > 8) || (row > 1)) return b;\r\n                        else {\r\n                            occupationArray[column][row] += 1;\r\n                            occupationArray[column][row + 1] += 1;\r\n                            occupationArray[column][row + 2] += 1;\r\n                            occupationArray[column][row + 3] += 1;\r\n                            occupationArray[column + 1][row] += 1;\r\n                            occupationArray[column + 1][row + 1] += 1;\r\n                        }\r\n                    }\r\n                } else if (charColour == '*') {\r\n                    occupationArray[column][row] += 1;\r\n                } else return b;\r\n            }\r\n\r\n            for(int i = 0; i < 10; i++) {\r\n                for(int j = 0; j < 5; j++) {\r\n                    if(occupationArray[i][j] > 1) return b;\r\n                }\r\n            }\r\n        }\r\n\r\n        return new Pair<>(true,occupationArray);\r\n    }\r\n\r\n\r\n\r\n    /**\r\n     * Return the sorted StringPlacement.\r\n     *\r\n     * @param placement A String placement.\r\n     * @return A sorted String placement according to the alphabetical order of the color of pieces.\r\n     */\r\n\r\n    public static String sortStringPlacement(String placement) {\r\n        List<String> grouped = new ArrayList<>();\r\n        for (int i = 0; i < placement.length(); i+=4) {\r\n            grouped.add(placement.substring(i,i+4));\r\n        }\r\n        grouped.sort(Comparator.comparing((String s) -> s.substring(0, 1).toLowerCase()));\r\n        String sorted = \"\";\r\n        for (String s : grouped) sorted += s;\r\n        return sorted;\r\n    }\r\n\r\n\r\n\r\n    /**\r\n     * Return the solution to a particular challenge.\r\n     **\r\n     * @param challenge A challenge string.\r\n     * @return A placement string describing the encoding of the solution to\r\n     * the challenge.\r\n     */\r\n    public static String getSolution(String challenge) {\r\n        for (int i = 0; i < Games.SOLUTIONS.length; i++) {\r\n            if (challenge == Games.SOLUTIONS[i].objective) {\r\n                return Games.SOLUTIONS[i].placement;\r\n            }\r\n        }\r\n        return null;  // FIXME Task 9: determine the solution to the game, given a particular challenge\r\n    }\r\n}\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/comp1110/ass2/FitGame.java	(revision 1b9494e82d5ba1e90b106974fd1bffbfc0257b9c)
++++ src/comp1110/ass2/FitGame.java	(date 1599838278087)
+@@ -27,30 +27,65 @@
+     static boolean isPiecePlacementWellFormed(String piecePlacement) {
+ 
+         /** test if the String has four characters. */
+-        if(piecePlacement.length()!=4){return false;}
++        if (piecePlacement.length() != 4) {return false;}
+ 
+         /** test if the first character is valid descriptor character. */
+-        switch (String.valueOf(piecePlacement.charAt(0)).toUpperCase()){
+-            case "B": case "G": case "I": case "L": case "N": case "O":case "P": case "R": case "S": case "Y": case "*":
+-                break; default: return false;
++        switch (String.valueOf(piecePlacement.charAt(0)).toUpperCase()) {
++            case "B":
++            case "G":
++            case "I":
++            case "L":
++            case "N":
++            case "O":
++            case "P":
++            case "R":
++            case "S":
++            case "Y":
++                break;
++            default:
++                return false;
+         }
+ 
+         /** test if the second character is between 0 to 9. */
+         String secondCharacter = String.valueOf(piecePlacement.charAt(1));
+-        switch (secondCharacter){case "0": case "1": case "2": case "3": case "4": case "5":case "6": case "7": case "8": case "9":
+-                break; default: return false;
++        switch (secondCharacter) {
++            case "0":
++            case "1":
++            case "2":
++            case "3":
++            case "4":
++            case "5":
++            case "6":
++            case "7":
++            case "8":
++            case "9":
++                break;
++            default:
++                return false;
+         }
+ 
+         /** test if the third character is between 0 to 4. */
+         String thirdCharacter = String.valueOf(piecePlacement.charAt(2));
+-        switch (thirdCharacter){case "0": case "1": case "2": case "3": case "4":
+-            break; default: return false;
++        switch (thirdCharacter) {
++            case "0":
++            case "1":
++            case "2":
++            case "3":
++            case "4":
++                break;
++            default:
++                return false;
+         }
+ 
+         /** test if the fourth character in valid orientation N, S, E, W */
+-        switch(String.valueOf(piecePlacement.charAt(3)).toUpperCase()){
+-            case "N": case "E": case "S": case "W":
+-                break; default: return false;
++        switch (String.valueOf(piecePlacement.charAt(3)).toUpperCase()) {
++            case "N":
++            case "E":
++            case "S":
++            case "W":
++                break;
++            default:
++                return false;
+         }
+ 
+ 
+@@ -79,7 +114,7 @@
+ 
+             // group input String as an ArrayList of 4 chars as it's element.
+             for (int i = 0; i < placement.length(); i++) {
+-                grouped.add(placement.substring(i,i+4));
++                grouped.add(placement.substring(i, i + 4));
+                 i = i + 3;
+             }
+             // check if the input satisfies condition 2.
+@@ -94,7 +129,7 @@
+                 StringBuilder shapes = new StringBuilder();
+                 // flatten the ArrayList into a String which only preserves shapes from the input.
+                 for (String s : grouped) {
+-                    shapes.append(s.toLowerCase().charAt(0));
++                    shapes.append(s.charAt(0));
+                 }
+ 
+                 // check if the input satisfies condition 3.
+@@ -106,942 +141,940 @@
+ 
+                     StringBuilder sortedShape = new StringBuilder();
+ 
+-                    for (char c : unsortedShapes) sortedShape.append(c);
++                    for (char c : unsortedShapes)
++                        sortedShape.append(c);
+                     //check if the input satisfies the last condition.
+                     if (!shapes.toString().toLowerCase().equals(sortedShape.toString())) {
+                         flag = false;
+                     }
+ 
+-                } else flag = false;
++                } else
++                    flag = false;
+             }
+-        } else flag = false;
++        } else
++            flag = false;
+ 
+-        return flag;
++        return flag; // FIXME Task 3: determine whether a placement is well-formed
+     }
+-
+-
+ 
+ 
+     /**
+      * Determine whether a placement string is valid.
+-     *
++     * <p>
+      * To be valid, the placement string must be:
+      * - well-formed, and
+      * - each piece placement must be a valid placement according to the
+-     *   rules of the game:
+-     *   - pieces must be entirely on the board
+-     *   - pieces must not overlap each other
++     * rules of the game:
++     * - pieces must be entirely on the board
++     * - pieces must not overlap each other
+      *
+      * @param placement A placement string
+      * @return True if the placement sequence is valid
+      */
+-    public static boolean isPlacementValid(String placement) {
+-        return validityOccupation(placement).getKey();
+-    }
+-
+-    /**
+-     * Given a string describing a placement of pieces, and a location
+-     * that must be covered by the next move, return a set of all
+-     * possible next viable piece placements which cover the location.
+-     *
+-     * For a piece placement to be viable it must:
+-     *  - be a well formed piece placement
+-     *  - be a piece that is not already placed
+-     *  - not overlap a piece that is already placed
+-     *  - cover the location
+-     *
+-     * @param placement A starting placement string
+-     * @param col      The location's column.
+-     * @param row      The location's row.
+-     * @return A set of all viable piece placements, or null if there are none.
+-     */
+-    static Set<String> getViablePiecePlacements(String placement, int col, int row) {
+-
+-        Set<String> result = new HashSet<>();
+-
+-        Integer columns = col;
+-        Integer rows = row;
+-        if (isPlacementValid(sortStringPlacement(placement+'*' + columns.toString() + rows.toString() + 'W'))) {
+-            for (Color c : Color.values()) {
+-                for (Direction d : Direction.values()) {
+-                    for (Integer y = 0; y < 5; y++) {
+-                        for (Integer x = 0; x < 10; x++) {
+-                            String newPiece = c.value + x.toString() + y.toString() + d.value;
+-                            if (isPlacementValid(sortStringPlacement(placement + newPiece))) {
+-                                String newPlacement =sortStringPlacement(placement + newPiece + '*' + columns.toString() + rows.toString() + 'W');
+-                                if (!isPlacementValid(newPlacement)) {
+-                                    if (c != Color.TEST) result.add(newPiece);
+-                                }
+-                            }
+-                        }
+-                    }
+-                }
+-            }
+-        } else return null;
+-
+-
+-
+-        if (result.size() == 0) return null;
+-        else return result;
+-
+-    }
+-
+-
+-    /**
+-     * Given a placement string, return a pair contains the validity of the placement according to the rule of the game and
+-     * an int array of array illustrate the real occupation of each pieces in the placement string.
+-     * into a List of Pairs.
+-     *
+-     * @param placement A string of placement.
+-     * @return A Pair of contains the validity of placement and the occupation int array of array.
+-     */
+-    public static Pair<Boolean, int[][]> validityOccupation(String placement) {
+-
+-        //create a container for pieces parsed from string
+-        ArrayList<String> pieces = new ArrayList<>();
+-
+-        for (int i = 0; i < placement.length(); i = i + 4) {
+-            pieces.add(placement.substring(i, i + 4));
+-        }
+-
+-
+-        //create a int array of array to illustrate the real occupation of pieces.
+-        int[][] occupationArray = new int[10][5];
+-
+-        Pair<Boolean, int[][]> b = new Pair<>(false, null);
+-
+-        if (!isPlacementWellFormed(placement)) return b;
+-        else {
+-            for (String piece : pieces) {
+-
+-                int row = Character.getNumericValue(piece.charAt(2));
+-                int column = Character.getNumericValue(piece.charAt(1));
+-                char charColour = piece.charAt(0);
+-                char charDirection = piece.charAt(3);
+-
+-
+-                if ((column < 0) || (column > 9) || (row < 0) || (row > 4)) return b;
+-
+-                if ((charDirection != 'N') && (charDirection != 'E') &&
+-                        (charDirection != 'S') && (charDirection != 'W')) return b;
+-
+-//            for (Direction d : Direction.values()) {
+-//                if (charDirection != d.value && d == Direction.WEST)
+-//                    return b;
+-//            }
+-
+-                if (charColour == 'b') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
++    public static boolean isPlacementValid(String placement) { // FIXME Task 5: determine whether a placement string is valid
++        int[][] pos = new int[10][5];
++        int i = 0;
++        int j = 0;
++        int col;
++        int row;
++        while (i < placement.length()) {
++            col = placement.charAt(i + 1) - '0';
++            row = placement.charAt(i + 2) - '0';
++            if ((col < 0) || (col > 9) | (row < 0) || (row > 4))
++                return false;
++            if ((placement.charAt(i + 3) != 'N') && (placement.charAt(i + 3) != 'E') &&
++                    (placement.charAt(i + 3) != 'S') && (placement.charAt(i + 3) != 'W'))
++                return false;
++            else if (placement.charAt(i) == 'b') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 3][row] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row] += 1;
++                        pos[col + 3][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'B') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 3][row] += 1;
++                        pos[col + 3][row + 1] += 1;
+                     }
+-                } else if (charColour == 'B') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'g') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
+                     }
+-                } else if (charColour == 'g') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row + 1] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'G') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
+                     }
+-                } else if (charColour == 'G') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'i') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
+                     }
+-                } else if (charColour == 'i') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'I') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
+                     }
+-                } else if (charColour == 'I') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'l') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 2][row] += 1;
+                     }
+-                } else if (charColour == 'l') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'L') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
+                     }
+-                } else if (charColour == 'L') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'n') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
+                     }
+-                } else if (charColour == 'n') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row + 1] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'N') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
+                     }
+-                } else if (charColour == 'N') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 7) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 2)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 7) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 2))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'o') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 3][row] += 1;
+                     }
+-                } else if (charColour == 'o') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'O') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row] += 1;
+                     }
+-                } else if (charColour == 'O') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row] += 1;
++                        pos[col + 3][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'p') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row] += 1;
+                     }
+-                } else if (charColour == 'p') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row + 1] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'P') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 3][row] += 1;
+                     }
+-                } else if (charColour == 'P') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row] += 1;
++                        pos[col + 3][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row + 2] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'r') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 3][row] += 1;
+                     }
+-                } else if (charColour == 'r') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row] += 1;
++                        pos[col + 3][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'R') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 3][row] += 1;
++                        pos[col + 3][row + 1] += 1;
+                     }
+-                } else if (charColour == 'R') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row] += 1;
++                        pos[col + 3][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 's') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 3][row] += 1;
+                     }
+-                } else if (charColour == 's') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'S') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row] += 1;
+                     }
+-                } else if (charColour == 'S') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'y') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 3][row] += 1;
++                        pos[col + 3][row + 1] += 1;
+                     }
+-                } else if (charColour == 'y') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row] += 1;
++                    }
++                }
++            } else if (placement.charAt(i) == 'Y') {
++                if (placement.charAt(i + 3) == 'N') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 2][row] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row] += 1;
++                        pos[col + 3][row + 1] += 1;
+                     }
+-                } else if (charColour == 'Y') {
+-                    if (charDirection == 'N') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 2][row] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else if (charDirection == 'E') {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 1][row + 2] += 1;
+-                            occupationArray[column + 1][row + 3] += 1;
+-                        }
+-                    } else if (charDirection == 'S') {
+-                        if ((column > 6) || (row > 3)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                            occupationArray[column + 2][row + 1] += 1;
+-                            occupationArray[column + 3][row + 1] += 1;
+-                        }
+-                    } else {
+-                        if ((column > 8) || (row > 1)) return b;
+-                        else {
+-                            occupationArray[column][row] += 1;
+-                            occupationArray[column][row + 1] += 1;
+-                            occupationArray[column][row + 2] += 1;
+-                            occupationArray[column][row + 3] += 1;
+-                            occupationArray[column + 1][row] += 1;
+-                            occupationArray[column + 1][row + 1] += 1;
+-                        }
++                } else if (placement.charAt(i + 3) == 'E') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row + 2] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 1][row + 2] += 1;
++                        pos[col + 1][row + 3] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'S') {
++                    if ((col > 6) || (row > 3))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
++                        pos[col + 2][row + 1] += 1;
++                        pos[col + 3][row + 1] += 1;
++                    }
++                } else if (placement.charAt(i + 3) == 'W') {
++                    if ((col > 8) || (row > 1))
++                        return false;
++                    else {
++                        pos[col][row] += 1;
++                        pos[col][row + 1] += 1;
++                        pos[col][row + 2] += 1;
++                        pos[col][row + 3] += 1;
++                        pos[col + 1][row] += 1;
++                        pos[col + 1][row + 1] += 1;
+                     }
+-                } else if (charColour == '*') {
+-                    occupationArray[column][row] += 1;
+-                } else return b;
+-            }
+-
+-            for(int i = 0; i < 10; i++) {
+-                for(int j = 0; j < 5; j++) {
+-                    if(occupationArray[i][j] > 1) return b;
+-                }
++                }
++            } else
++                return false;
++            i += 4;
++        }
++        for (i = 0; i < 10; i++) {
++            for (j = 0; j < 5; j++) {
++                if (pos[i][j] > 1)
++                    return false;
+             }
+         }
+-
+-        return new Pair<>(true,occupationArray);
++        return true;
+     }
+-
+-
+ 
+     /**
+-     * Return the sorted StringPlacement.
++     * Given a string describing a placement of pieces, and a location
++     * that must be covered by the next move, return a set of all
++     * possible next viable piece placements which cover the location.
++     * <p>
++     * For a piece placement to be viable it must:
++     * - be a well formed piece placement
++     * - be a piece that is not already placed
++     * - not overlap a piece that is already placed
++     * - cover the location
+      *
+-     * @param placement A String placement.
+-     * @return A sorted String placement according to the alphabetical order of the color of pieces.
++     * @param placement A starting placement string
++     * @param col       The location's column.
++     * @param row       The location's row.
++     * @return A set of all viable piece placements, or null if there are none.
+      */
+-
+-    public static String sortStringPlacement(String placement) {
+-        List<String> grouped = new ArrayList<>();
+-        for (int i = 0; i < placement.length(); i+=4) {
+-            grouped.add(placement.substring(i,i+4));
+-        }
+-        grouped.sort(Comparator.comparing((String s) -> s.substring(0, 1).toLowerCase()));
+-        String sorted = "";
+-        for (String s : grouped) sorted += s;
+-        return sorted;
++    static Set<String> getViablePiecePlacements(String placement, int col, int row) {
++        return null; // FIXME Task 6: determine the set of all viable piece placements given existing placements
+     }
+-
+-
+ 
+     /**
+      * Return the solution to a particular challenge.
+-     **
++     * *
++     *
+      * @param challenge A challenge string.
+      * @return A placement string describing the encoding of the solution to
+      * the challenge.
+      */
++
+     public static String getSolution(String challenge) {
+         for (int i = 0; i < Games.SOLUTIONS.length; i++) {
+             if (challenge == Games.SOLUTIONS[i].objective) {
+@@ -1051,5 +1084,3 @@
+         return null;  // FIXME Task 9: determine the solution to the game, given a particular challenge
+     }
+ }
+-
+-

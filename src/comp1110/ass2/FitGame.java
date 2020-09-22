@@ -53,7 +53,6 @@ public class FitGame {
                 break; default: return false;
         }
 
-
         return true; // FIXME Task 2: determine whether a piece placement is well-formed
     }
 
@@ -1085,6 +1084,7 @@ public class FitGame {
      * @return A placement string describing the encoding of the solution to
      * the challenge.
      */
+
     public static String getSolution(String challenge) {
         for (int i = 0; i < Games.SOLUTIONS.length; i++) {
             if (challenge == Games.SOLUTIONS[i].objective) {
