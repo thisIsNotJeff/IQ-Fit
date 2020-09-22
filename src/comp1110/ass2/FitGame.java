@@ -24,13 +24,15 @@ public class FitGame {
      * @param piecePlacement A string describing a piece placement
      * @return True if the piece placement is well-formed
      */
+
     static boolean isPiecePlacementWellFormed(String piecePlacement) {
 
         /** test if the String has four characters. */
         if(piecePlacement.length()!=4){return false;}
 
         /** test if the first character is valid descriptor character. */
-        switch (String.valueOf(piecePlacement.charAt(0)).toUpperCase()){
+        String firstCharacter = String.valueOf(piecePlacement.charAt(0)).toUpperCase();
+        switch (firstCharacter){
             case "B": case "G": case "I": case "L": case "N": case "O":case "P": case "R": case "S": case "Y": case "*":
                 break; default: return false;
         }
@@ -48,14 +50,13 @@ public class FitGame {
         }
 
         /** test if the fourth character in valid orientation N, S, E, W */
-        switch(String.valueOf(piecePlacement.charAt(3)).toUpperCase()){
+        String forthCharacter = String.valueOf(piecePlacement.charAt(3));
+        switch(forthCharacter){
             case "N": case "E": case "S": case "W":
                 break; default: return false;
         }
-
         return true; // FIXME Task 2: determine whether a piece placement is well-formed
     }
-
     /**
      * Determine whether a placement string is well-formed:
      * - it consists of exactly N four-character piece placements (where N = 1 .. 10);
@@ -233,7 +234,8 @@ public class FitGame {
 
         Pair<Boolean, int[][]> b = new Pair<>(false, null);
 
-        if (!isPlacementWellFormed(placement)) return b;
+        if (placement.length() == 0) return new Pair<>(true,new int[10][5]);
+        else if (!isPlacementWellFormed(placement)) return b;
         else {
             for (String piece : pieces) {
 
@@ -1090,8 +1092,20 @@ public class FitGame {
                 return Games.SOLUTIONS[i].placement;
             }
         }
+
+
+
+
+
+
+
+
+
+
         return null;  // FIXME Task 9: determine the solution to the game, given a particular challenge
     }
+
+
 }
 
 
