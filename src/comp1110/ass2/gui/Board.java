@@ -82,33 +82,29 @@ public class Board extends Application {
                 @Override
                 public void handle(ActionEvent e) {
                     current[0] = num;   //change current piece
-                    for(int j = 0; j < 10; j++) {
-                        if(j == num) {
-                            root.getChildren().remove(pieceView);
-                            //the flip state will be saved
-                            //when coming back from another piece, the previous state won't change
-                            if(current_f[num] == 1) {
-                                Image image = new Image(path1[num]);
-                                pieceView.setImage(image);
-                            }
-                            else {
-                                Image image = new Image(path2[num]);
-                                pieceView.setImage(image);
-                            }
-                            //different piece will be showed in different scale
-                            if((num >= 1)&(num <= 4)) {
-                                pieceView.setFitWidth(175);
-                                pieceView.setFitHeight(110);
-                            }
-                            else {
-                                pieceView.setFitWidth(235);
-                                pieceView.setFitHeight(110);
-                            }
-                            pieceView.setLayoutX(150);
-                            pieceView.setLayoutY(450);
-                            root.getChildren().add(pieceView);
-                        }
+                    root.getChildren().remove(pieceView);
+                    //the flip state will be saved
+                    //when coming back from another piece, the previous state won't change
+                    if(current_f[num] == 1) {
+                        Image image = new Image(path1[num]);
+                        pieceView.setImage(image);
                     }
+                    else {
+                        Image image = new Image(path2[num]);
+                        pieceView.setImage(image);
+                    }
+                    //different piece will be showed in different scale
+                    if((num >= 1)&(num <= 4)) {
+                        pieceView.setFitWidth(175);
+                        pieceView.setFitHeight(110);
+                    }
+                    else {
+                        pieceView.setFitWidth(235);
+                        pieceView.setFitHeight(110);
+                    }
+                    pieceView.setLayoutX(150);
+                    pieceView.setLayoutY(450);
+                    root.getChildren().add(pieceView);
                 }
             });
         }
