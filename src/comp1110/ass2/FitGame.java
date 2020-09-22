@@ -156,7 +156,6 @@ public class FitGame {
      * @return A set of all viable piece placements, or null if there are none.
      */
     static Set<String> getViablePiecePlacements(String placement, int col, int row) {
-        System.out.println("placement is "+placement);
 
         Set<String> result = new HashSet<>();
 
@@ -235,7 +234,8 @@ public class FitGame {
 
         Pair<Boolean, int[][]> b = new Pair<>(false, null);
 
-        if (!isPlacementWellFormed(placement)) return b;
+        if (placement.length() == 0) return new Pair<>(true,new int[10][5]);
+        else if (!isPlacementWellFormed(placement)) return b;
         else {
             for (String piece : pieces) {
 
