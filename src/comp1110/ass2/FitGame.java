@@ -170,7 +170,7 @@ public class FitGame {
 
             for (Color c : Color.values()) {
                 if (c == Color.TEST) continue;
-                if (placement.length() == 0||!Arrays.asList(usedColor).contains(Character.toLowerCase(c.value))) {
+                if (placement.length() == 0 || !Arrays.asList(usedColor).contains(Character.toLowerCase(c.value))) {
                     for (Direction d : Direction.values()) {
                         for (Integer y = 0; y < 5; y++) {
                             for (Integer x = 0; x < 10; x++) {
@@ -1063,12 +1063,20 @@ public class FitGame {
      * @param placement A String placement.
      * @return A sorted String placement according to the alphabetical order of the color of pieces.
      */
-
     public static String sortStringPlacement(String placement) {
         List<String> grouped = new ArrayList<>();
-        for (int i = 0; i < placement.length(); i+=4) {
-            grouped.add(placement.substring(i,i+4));
+
+        if (placement.length() == 0 || placement.length() % 4 != 0)
+            throw new IllegalArgumentException("Incorrect placement String");
+        else {
+            for (int i = 0; i < placement.length(); i+=4) {
+                String piece = placement.substring(i,i+4);
+                if (isPiecePlacementWellFormed(piece))
+                grouped.add(piece);
+                else throw new IllegalArgumentException("Incorrect placement String");
+            }
         }
+
         grouped.sort(Comparator.comparing((String s) -> s.substring(0, 1).toLowerCase()));
         String sorted = "";
         for (String s : grouped) sorted += s;

@@ -66,7 +66,7 @@ public class Board extends Application {
         //number of piece showing on screen, show the first puzzle piece in beginning
         final int[] current = {0};
         /*the flip state of each piece
-        /use picture in path1 when equals to 1,use piece in path2 when equals to 2*/
+        use picture in path1 when equals to 1,use piece in path2 when equals to 2*/
         final int[] current_f = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
         Image origion = new Image(path1[current[0]]);//the screen shows the first puzzle piece at the beginning
         ImageView pieceView = new ImageView();
@@ -141,6 +141,8 @@ public class Board extends Application {
     }
 
     // FIXME Task 8: Implement challenges (you may use assets provided for you in comp1110.ass2.gui.assets)
+
+    
 
     // FIXME Task 10: Implement hints (should become visible when the user presses '/' -- see gitlab issue for details)
 
