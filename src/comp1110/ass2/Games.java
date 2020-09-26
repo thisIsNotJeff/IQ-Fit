@@ -167,7 +167,6 @@ public class Games {
    *
    * @return An Game at the appropriate level of difficulty.
    */
-
   public static Games newGames(int difficulty) {
     if (difficulty == 0){return SOLUTIONS[(int)(Math.random()*24)];}
     else if (difficulty == 1){return SOLUTIONS[(int)(Math.random()*24+24)];}
@@ -175,9 +174,8 @@ public class Games {
     else if (difficulty == 3){return SOLUTIONS[(int)(Math.random()*24+72)];}
     else if (difficulty == 4){return SOLUTIONS[(int)(Math.random()*24+96)];}
     // assert difficulty >= 0 && difficulty <= 4;
-    return SOLUTIONS[1];
+    return null;
   }
-
   public int getNumber() {
     return number;
   }

@@ -1,25 +1,28 @@
 package comp1110.ass2;
 
 import org.junit.Test;
-
-import java.util.HashSet;
 import static org.junit.Assert.assertTrue;
 
-public class newGamesTest {
+public class NewGamesTest {
 
-    private int getDifficulty(Games objective) {
+    /**
+     * @param game the game
+     * @return the difficulty level of the game (0 - starter, 1 - junior, 2 - expert, 3 - master, 4 - wizard)
+     */
+    public int getDifficulty(Games game) {
         for (int i = 0; i < Games.SOLUTIONS.length; i++) {
-            if (objective == Games.SOLUTIONS[i])
+            if (game == Games.SOLUTIONS[i])
                 return i / (Games.SOLUTIONS.length/5);
         }
         return -1;
     }
 
+    /**
+     * @param games the array contained numbers of games objective
+     * @return the number of games contained in the array
+     */
     private int countGames(Games[] games) {
-        HashSet<Games> set = new HashSet<>();
-        for (Games i : games)
-            set.add(i);
-        return set.size();
+        return games.length;
     }
 
     private void doTest(int difficulty) {
@@ -27,10 +30,10 @@ public class newGamesTest {
         for (int i = 0; i < out.length; i++) {
             out[i] = Games.newGames(difficulty);
             int diff = getDifficulty(out[i]);
-            assertTrue("Expected difficulty " + difficulty + ", but " + (diff == -1 ? "did not get one from the prepared objectives" : "got one of difficulty " + diff) + ": problem number " + out[i].getNumber() + ".", diff == difficulty);
+            assertTrue("Expected difficulty " + difficulty + ", but " + (diff == -1 ? "did not get one from the prepared games" : "got one of difficulty " + diff) + ": problem number " + out[i].getNumber() + ".", diff == difficulty);
         }
         int unique = countGames(out);
-        assertTrue("Expected at least 3 different objectives after calling newObjective() 24 times, but only got " + unique + ".", unique >= 3);
+        assertTrue("Expected at least 3 different objectives after calling newGames() 24 times, but only got " + unique + ".", unique >= 3);
     }
 
     @Test
