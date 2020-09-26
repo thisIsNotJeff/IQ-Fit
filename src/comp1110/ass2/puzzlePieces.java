@@ -20,7 +20,6 @@ public class puzzlePieces {
         this.column=column;
     }
 
-
     /**
      * @return the orientation of this puzzle piece placed
      */
@@ -34,18 +33,6 @@ public class puzzlePieces {
     public Color getColor() {
         return color;
     }
-
-//    /**
-//     * @return the position of this puzzle piece
-//     */
-//    public int[][] getPosition() {
-//        return position;
-//    }
-
-
-
-
-
 
 }
 

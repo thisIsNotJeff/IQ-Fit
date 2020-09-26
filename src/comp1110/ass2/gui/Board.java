@@ -148,8 +148,6 @@ public class Board extends Application {
 
     // FIXME Task 11: Generate interesting challenges (each challenge may have just one solution)
 
-
-
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Fit Game");

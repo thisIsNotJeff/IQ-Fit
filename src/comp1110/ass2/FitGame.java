@@ -1101,15 +1101,6 @@ public class FitGame {
             }
         }
 
-
-
-
-
-
-
-
-
-
         return null;  // FIXME Task 9: determine the solution to the game, given a particular challenge
     }
 

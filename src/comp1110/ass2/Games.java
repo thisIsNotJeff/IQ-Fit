@@ -8,15 +8,27 @@ public class Games {
   String placement;
   Set<String> placements;
 
-  Games(int iNumber, String iObjective, String iPlacement) {
-    number = iNumber;
-    objective = iObjective;
-    placement = iPlacement;
-    placements = new HashSet<>();
-    placements.add(iPlacement);
+  public Games(int iNumber, String iObjective, String iPlacement) {
+    this.number = iNumber;
+    this.objective = iObjective;
+    this.placement = iPlacement;
+    this.placements = new HashSet<>();
+    this.placements.add(iPlacement);
   }
 
+  /**
+   * This array defines a set of 120 pre-defined FitGames.
+   *
+   * There are 5 categories of Games, according to 5 difficulty levels, organized within the array as follows:
+   *
+   * Starter: 1-24
+   * Junior: 24-48
+   * Expert: 48-72
+   * Master: 72-96
+   * Wizard: 96-120
+   */
   public static final Games[] SOLUTIONS = {
+          // Starter level
           new Games(1, "B03SG70Si52SL00Nn01Er41WS40Ny62N", "B03SG70Si52SL00Nn01Eo63Sp20Er41WS40Ny62N"),
           new Games(2, "G00WI10Nl02SN82Eo31Sr40Ns52Sy43S", "b03SG00WI10Nl02SN82Eo31SP60Sr40Ns52Sy43S"),
           new Games(3, "G11SI73Sl43Sn32So80Ep50Ns03SY51S", "b00WG11SI73Sl43Sn32So80Ep50NR10Ns03SY51S"),
@@ -41,6 +53,8 @@ public class Games {
           new Games(22, "B51Sg02Nl32WN03Sr60Ns53S", "B51Sg02Ni42Sl32WN03SO81Ep20Nr60Ns53SY00S"),
           new Games(23, "b43Sn61WO50NR22Ss80Ey03S", "b43SG01EI30El82Wn61WO50Np00NR22Ss80Ey03S"),
           new Games(24, "b20Ni80Wn51Wp81Er31ES53S", "b20NG60Ei80WL12Nn51Wo03Sp81Er31ES53SY00W"),
+
+          // Junior
           new Games(25, "b81EG00WL40Eo33NP53SY03S", "b81EG00Wi61SL40En30Wo33NP53Sr10Es60NY03S"),
           new Games(26, "g70NI10SL52Ep81Er00Ws03S", "b11Sg70NI10SL52En33NO71Wp81Er00Ws03SY30N"),
           new Games(27, "b81Eg03SN72Eo61WP00NY41E", "b81Eg03Si40WL02NN72Eo61WP00Nr21Es60NY41E"),
@@ -65,6 +79,8 @@ public class Games {
           new Games(46, "o20Sr50ES70WY22N", "b00Ng01Ei33Sl80EN03So20SP63Sr50ES70WY22N"),
           new Games(47, "b63So43NS11EY41S", "b63Sg81Wi40Nl02WN70No43NP00Nr31WS11EY41S"),
           new Games(48, "G82Eo00Wp32Ny60N", "b03SG82Ei11El10NN43So00Wp32NR71WS30Sy60N"),
+
+          // Expert
           new Games(49, "b41Wg81WY01W", "b41Wg81WI13SL70Nn21EO63Sp00Nr40Es60WY01W"),
           new Games(50, "b52Nl00WN22No60N", "b52Ng63NI03Sl00WN22No60NP10NR81Es30Sy33S"),
           new Games(51, "b10Nl00Wn32NS60N", "b10NG62Ni11El00Wn32No30Sp43SR03SS60NY81E"),
@@ -89,6 +105,8 @@ public class Games {
           new Games(70, "i03Sn32WS43S", "b80EG00Wi03Sl82Wn32Wo50SP30NR10ES43Sy42N"),
           new Games(71, "b53Si71Wl82En41S", "b53SG11Si71Wl82En41So33Np20NR60NS03SY00W"),
           new Games(72, "b43SG82WR11S", "b43SG82Wi70Wl32Sn80Eo50EP20NR11SS03Sy00W"),
+
+          //Master
           new Games(73, "n11Sp13SS53S", "B01Wg61SI40Wl32Sn11SO81Ep13Sr60NS53Sy00N"),
           new Games(74, "b81EI21Es53S", "b81EG10NI21EL62Nn03So00WP60Nr40Es53Sy31E"),
           new Games(75, "g73Si41Sn03Sp80E", "B00Wg73Si41SL61En03So10Ep80ER50NS33Sy30W"),
@@ -113,6 +131,8 @@ public class Games {
           new Games(94, "b42So10N", "b42SG50Ei02EL70Nn81Wo10Np00Wr63SS21SY23S"),
           new Games(95, "G41Ny30W", "B00WG41Ni50Nl61Sn10Eo63SP43Nr80ES03Sy30W"),
           new Games(96, "g71En21Ny03S", "B60Ng71Ei82El00Wn21NO12SP43Sr10NS50Wy03S"),
+
+          // Wizard
           new Games(97, "g60Sl41W", "b01Wg60SI00Nl41WN12NO30Np63SR80Es52Ny23S"),
           new Games(98, "i22Ns50W", "b00Ng01Ei22Nl20SN03SO60Np71WR33Ss50WY81E"),
           new Games(99, "G73Sl02Ws33S", "B70WG73SI40Nl02Wn80Eo13NP11Nr00Ns33Sy32N"),
@@ -138,4 +158,56 @@ public class Games {
           new Games(119, "g20SS43S", "B12Ng20Si82El01Wn00No40NP60Sr03SS43SY52N"),
           new Games(120, "l21WY51S", "B00NG53Ni30El21Wn73So80Ep50Nr13SS01WY51S")
   };
+
+  /**
+   * The method selects a randomized Game from the 120 pre-defined Games,
+   *
+   * @param difficulty The difficulty of the game (0 - starter, 1 - junior, 2 - expert, 3 - master, 4 - wizard)
+   *
+   * @return An Game at the appropriate level of difficulty.
+   */
+  public static Games newGames(int difficulty) {
+    if (difficulty == 0){return SOLUTIONS[(int)(Math.random()*24)];}
+    else if (difficulty == 1){return SOLUTIONS[(int)(Math.random()*24+24)];}
+    else if (difficulty == 2){return SOLUTIONS[(int)(Math.random()*24+48)];}
+    else if (difficulty == 3){return SOLUTIONS[(int)(Math.random()*24+72)];}
+    else if (difficulty == 4){return SOLUTIONS[(int)(Math.random()*24+96)];}
+    // assert difficulty >= 0 && difficulty <= 4;
+    return null;
+  }
+
+  /**
+   *  This method tests if two Games are the same
+   */
+  public boolean equals(Games other){
+    if(this.number == other.number){} else return false;
+    if(this.objective == other.objective){} else return false;
+    if(this.placement == other.placement){} else return false;
+    return true;
+  }
+
+  /**
+   * @param game the game
+   * @return the difficulty level of the game (0 - starter, 1 - junior, 2 - expert, 3 - master, 4 - wizard, -1 - not a pre-defined game)
+   */
+  public static int getDifficulty(Games game) {
+    for (int i = 0; i < Games.SOLUTIONS.length; i++) {
+      if (game.equals(Games.SOLUTIONS[i]))
+        return i / (Games.SOLUTIONS.length/5);
+    }
+    return -1;
+  }
+
+  /**
+   * @param games the array contained numbers of games objective
+   * @return the number of games contained in the array
+   */
+  public static int countGames(Games[] games) {
+    return games.length;
+  }
+
+  public int getNumber() {
+    return number;
+  }
+
 }
