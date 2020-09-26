@@ -176,7 +176,7 @@ public class Games {
     else if (difficulty == 3){return SOLUTIONS[(int)(Math.random()*24+72)];}
     else if (difficulty == 4){return SOLUTIONS[(int)(Math.random()*24+96)];}
     // assert difficulty >= 0 && difficulty <= 4;
-    return null; // FIXME Task 5 (P)
+    return SOLUTIONS[1]; // FIXME Task 5 (P)
   }
 
 }
