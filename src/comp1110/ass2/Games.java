@@ -8,7 +8,7 @@ public class Games {
   String placement;
   Set<String> placements;
 
-  Games(int iNumber, String iObjective, String iPlacement) {
+  public Games(int iNumber, String iObjective, String iPlacement) {
     this.number = iNumber;
     this.objective = iObjective;
     this.placement = iPlacement;
@@ -160,7 +160,6 @@ public class Games {
   };
 
   /**
-   *
    * The method selects a randomized Game from the 120 pre-defined Games,
    *
    * @param difficulty The difficulty of the game (0 - starter, 1 - junior, 2 - expert, 3 - master, 4 - wizard)
@@ -177,7 +176,38 @@ public class Games {
     return null;
   }
 
+  /**
+   *  This method tests if two Games are the same
+   */
+  public boolean equals(Games other){
+    if(this.number == other.number){} else return false;
+    if(this.objective == other.objective){} else return false;
+    if(this.placement == other.placement){} else return false;
+    return true;
+  }
+
+  /**
+   * @param game the game
+   * @return the difficulty level of the game (0 - starter, 1 - junior, 2 - expert, 3 - master, 4 - wizard, -1 - not a pre-defined game)
+   */
+  public static int getDifficulty(Games game) {
+    for (int i = 0; i < Games.SOLUTIONS.length; i++) {
+      if (game.equals(Games.SOLUTIONS[i]))
+        return i / (Games.SOLUTIONS.length/5);
+    }
+    return -1;
+  }
+
+  /**
+   * @param games the array contained numbers of games objective
+   * @return the number of games contained in the array
+   */
+  public static int countGames(Games[] games) {
+    return games.length;
+  }
+
   public int getNumber() {
     return number;
   }
+
 }
