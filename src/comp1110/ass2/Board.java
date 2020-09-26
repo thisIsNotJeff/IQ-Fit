@@ -9,7 +9,6 @@ public class Board {
      * @param difficulty difficulty of the game
      */
     public Board(int difficulty) {
-
     }
 
 
