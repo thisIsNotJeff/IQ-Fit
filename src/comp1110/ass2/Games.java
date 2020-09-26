@@ -9,15 +9,25 @@ public class Games {
   Set<String> placements;
 
   Games(int iNumber, String iObjective, String iPlacement) {
-    number = iNumber;
-    objective = iObjective;
-    placement = iPlacement;
-    placements = new HashSet<>();
-    placements.add(iPlacement);
+    this.number = iNumber;
+    this.objective = iObjective;
+    this.placement = iPlacement;
+    this.placements = new HashSet<>();
+    this.placements.add(iPlacement);
   }
 
+  /**
+   * This array defines a set of 120 pre-defined FitGames.
+   *
+   * There are 5 categories of Games, according to 5 difficulty levels, organized within the array as follows:
+   *
+   * Starter: 1-24
+   * Junior: 13-48
+   * Expert: 25-72
+   * Master: 37-96
+   * Wizard: 49-120
+   */
   public static final Games[] SOLUTIONS = {
-
           // Starter level
           new Games(1, "B03SG70Si52SL00Nn01Er41WS40Ny62N", "B03SG70Si52SL00Nn01Eo63Sp20Er41WS40Ny62N"),
           new Games(2, "G00WI10Nl02SN82Eo31Sr40Ns52Sy43S", "b03SG00WI10Nl02SN82Eo31SP60Sr40Ns52Sy43S"),
@@ -158,15 +168,15 @@ public class Games {
    *
    * @return An Challenge at the appropriate level of difficulty.
    */
+
   public static Games newGames(int difficulty) {
     if (difficulty == 0){return SOLUTIONS[(int)(Math.random()*24)];}
-    else if (difficulty == 1){return SOLUTIONS[(int)(Math.random()*12+48)];}
-    else if (difficulty == 2){return SOLUTIONS[(int)(Math.random()*12+72)];}
-    else if (difficulty == 3){return SOLUTIONS[(int)(Math.random()*12+96)];}
-    else if (difficulty == 4){return SOLUTIONS[(int)(Math.random()*12+120)];}
+    else if (difficulty == 1){return SOLUTIONS[(int)(Math.random()*24+24)];}
+    else if (difficulty == 2){return SOLUTIONS[(int)(Math.random()*24+48)];}
+    else if (difficulty == 3){return SOLUTIONS[(int)(Math.random()*24+72)];}
+    else if (difficulty == 4){return SOLUTIONS[(int)(Math.random()*24+96)];}
     // assert difficulty >= 0 && difficulty <= 4;
-    return SOLUTIONS[1]; // FIXME Task 5 (P)
+    return null; // FIXME Task 5 (P)
   }
-
 
 }
