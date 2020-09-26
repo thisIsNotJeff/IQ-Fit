@@ -160,13 +160,12 @@ public class Games {
   };
 
   /**
-   * Choose a new objective, given a difficulty level.
    *
-   * The method should select a randomized Challenge String from the 120 pre-defined Challenge,
+   * The method selects a randomized Game from the 120 pre-defined Games,
    *
    * @param difficulty The difficulty of the game (0 - starter, 1 - junior, 2 - expert, 3 - master, 4 - wizard)
    *
-   * @return An Challenge at the appropriate level of difficulty.
+   * @return An Game at the appropriate level of difficulty.
    */
 
   public static Games newGames(int difficulty) {
@@ -182,5 +181,4 @@ public class Games {
   public int getNumber() {
     return number;
   }
-
 }
