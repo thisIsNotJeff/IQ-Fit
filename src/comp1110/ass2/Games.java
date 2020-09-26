@@ -22,10 +22,10 @@ public class Games {
    * There are 5 categories of Games, according to 5 difficulty levels, organized within the array as follows:
    *
    * Starter: 1-24
-   * Junior: 13-48
-   * Expert: 25-72
-   * Master: 37-96
-   * Wizard: 49-120
+   * Junior: 24-48
+   * Expert: 48-72
+   * Master: 72-96
+   * Wizard: 96-120
    */
   public static final Games[] SOLUTIONS = {
           // Starter level
@@ -176,6 +176,7 @@ public class Games {
     // assert difficulty >= 0 && difficulty <= 4;
     return null;
   }
+
   public int getNumber() {
     return number;
   }

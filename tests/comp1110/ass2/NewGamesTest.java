@@ -25,7 +25,7 @@ public class NewGamesTest {
         return games.length;
     }
 
-    private void doTest(int difficulty) {
+    private void testDifficulty(int difficulty) {
         Games[] out = new Games[24];
         for (int i = 0; i < out.length; i++) {
             out[i] = Games.newGames(difficulty);
@@ -38,22 +38,22 @@ public class NewGamesTest {
 
     @Test
     public void testStarter() {
-        doTest(0);
+        testDifficulty(0);
     }
 
     @Test
     public void testJunior() {
-        doTest(1);
+        testDifficulty(1);
     }
 
     @Test
     public void testExpert() {
-        doTest(2);
+        testDifficulty(2);
     }
 
     @Test
-    public void testMaster() { doTest(3); }
+    public void testMaster() { testDifficulty(3); }
 
     @Test
-    public void testWizard() { doTest(4); }
+    public void testWizard() { testDifficulty(4); }
 }
