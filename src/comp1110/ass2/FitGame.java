@@ -162,27 +162,31 @@ public class FitGame {
         Integer columns = col;
         Integer rows = row;
         String newPiece;
+        // get all the possible locations
+        var neighbor = getNeighbor(row, col);
 
-
+        // collect the used colors, so we don't need to iterate all the possibilities.
         Character[] usedColor = getUsedColor(placement);
 
-        if (isPlacementValid(sortStringPlacement(placement+'*' + columns.toString() + rows.toString() + 'W'))) {
-
+        // first check if the input placement plus a test color(which only occupy that location) is valid
+        if (isPlacementValid(sortStringPlacement(placement + '*' + columns.toString() + rows.toString() + 'W'))) {
+            // then iterate through all the colors exclude the Test one.
             for (Color c : Color.values()) {
                 if (c == Color.TEST) continue;
-                if (placement.length() == 0||!Arrays.asList(usedColor).contains(Character.toLowerCase(c.value))) {
+                // check if the board is empty or the current iterating color haven't been used.
+                if (placement.length() == 0 || !Arrays.asList(usedColor).contains(Character.toLowerCase(c.value))) {
+                    // iterate through every direction
                     for (Direction d : Direction.values()) {
-                        for (Integer y = 0; y < 5; y++) {
-                            for (Integer x = 0; x < 10; x++) {
-                                newPiece = c.value + x.toString() + y.toString() + d.value;
-                                var pair = validityOccupation(sortStringPlacement(placement+newPiece));
-                                var occupationArray = pair.getValue();
-                                var valid = pair.getKey();
-                                if (valid) {
-                                    if (occupationArray[col][row] == 1) {
-                                        result.add(newPiece);
-                                    }
-                                }
+                        //iterate through every possible location.
+                        for (Pair<Integer, Integer> p : neighbor) {
+                            newPiece = c.value + p.getValue().toString() + p.getKey().toString() + d.value;
+                            var pair = validityOccupation(sortStringPlacement(placement + newPiece));
+                            var occupation = pair.getValue();
+                            var valid = pair.getKey();
+                            if (valid) {
+                                //to see of that place is taken.
+                                if (occupation[col][row] == 1)
+                                    result.add(newPiece);
                             }
                         }
                     }
@@ -194,7 +198,51 @@ public class FitGame {
         else return result;
 
     }
+    /**
+     * Given a row and column, return all the coordinates between row±3 (between 0-4) and column±3 (between 0-9)
+     *
+     * @param row The current row.
+     * @param col The current column.
+     * @return A set of pairs with key represents the row, value represents the column.
+     */
+    public static Set<Pair<Integer, Integer>> getNeighbor(int row, int col) {
+        Set<Pair<Integer, Integer>> neighbor = new HashSet<>();
+        int rowEnd = 0;
+        int rowStart = 0;
 
+        // find out the end location of row.
+        for (int i = row; i < row + 4; i++) {
+            if (i > 4) break;
+            else rowEnd = i;
+        }
+        // find out the start location of row.
+        for (int i = row; i > row - 4; i--) {
+            if (i < 0) break;
+            else rowStart = i;
+        }
+
+        int colEnd = 0;
+        int colStart = 0;
+        // find out the end location of column.
+        for (int i = col; i < col + 4; i++) {
+            if (i > 9) break;
+            else colEnd = i;
+        }
+
+        // find out the start location of column.
+        for (int i = col; i > col - 4; i--) {
+            if (i < 0) break;
+            else colStart = i;
+        }
+        // add all the coordinates between rowStart to rowEnd and colStart to colEnd.
+        for (int i = rowStart; i < rowEnd + 1; i++) {
+            for (int j = colStart; j < colEnd + 1; j++) {
+                neighbor.add(new Pair<>(i, j));
+            }
+        }
+
+        return neighbor;
+    }
 
     /**
      * Given a placement string, return all the used color in the placement.
@@ -208,6 +256,35 @@ public class FitGame {
             used.add(Character.toLowerCase(placement.charAt(i)));
         }
         return used.toArray(new Character[0]);
+    }
+
+    /**
+     * Return the sorted StringPlacement, the input string must be composed by well formed String pieces.
+     *
+     * @param placement A String placement.
+     * @return A sorted String placement according to the alphabetical order of the color of pieces.
+     */
+    public static String sortStringPlacement(String placement) {
+        List<String> grouped = new ArrayList<>();
+
+        // if the input is in the incorrect length, throw exception.
+        if (placement.length() == 0 || placement.length() % 4 != 0)
+            throw new IllegalArgumentException("Incorrect placement String");
+            // if any of the pieces of the placement String is not well formed, throw exception.
+        else {
+            for (int i = 0; i < placement.length(); i+=4) {
+                String piece = placement.substring(i,i+4);
+                if (isPiecePlacementWellFormed(piece))
+                    grouped.add(piece);
+                else throw new IllegalArgumentException("Incorrect placement String");
+            }
+        }
+        // sort the ArrayList of String pieces according to their color.
+        grouped.sort(Comparator.comparing((String s) -> s.substring(0, 1).toLowerCase()));
+        String sorted = "";
+        // recompose the placement String.
+        for (String s : grouped) sorted += s;
+        return sorted;
     }
 
 
@@ -234,7 +311,7 @@ public class FitGame {
 
         Pair<Boolean, int[][]> b = new Pair<>(false, null);
 
-        if (placement.length() == 0) return new Pair<>(true,new int[10][5]);
+        if (placement.length() == 0) return new Pair<>(true,occupationArray);
         else if (!isPlacementWellFormed(placement)) return b;
         else {
             for (String piece : pieces) {
@@ -1055,24 +1132,6 @@ public class FitGame {
     }
 
 
-
-    /**
-     * Return the sorted StringPlacement.
-     *
-     * @param placement A String placement.
-     * @return A sorted String placement according to the alphabetical order of the color of pieces.
-     */
-
-    public static String sortStringPlacement(String placement) {
-        List<String> grouped = new ArrayList<>();
-        for (int i = 0; i < placement.length(); i+=4) {
-            grouped.add(placement.substring(i,i+4));
-        }
-        grouped.sort(Comparator.comparing((String s) -> s.substring(0, 1).toLowerCase()));
-        String sorted = "";
-        for (String s : grouped) sorted += s;
-        return sorted;
-    }
 
 
 
