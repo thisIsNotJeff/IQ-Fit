@@ -25,7 +25,7 @@ public class GameBoard {
      * of the board. Otherwise return false.
      */
     public static boolean canBePut(PuzzlePieces puzzle, int[][] occupationArray) {
-        String pos = puzzle.color + String.valueOf(puzzle.column) + puzzle.row + puzzle.direction;
+        String pos = puzzle.toString();
         if(!FitGame.validityOccupation(pos).getKey()) return false;
         int[][] previous_occupation;
         int[][] puzzle_occupation;

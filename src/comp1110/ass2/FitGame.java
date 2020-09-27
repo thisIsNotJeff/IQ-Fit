@@ -136,7 +136,7 @@ public class FitGame {
      * @return True if the placement sequence is valid
      */
     public static boolean isPlacementValid(String placement) {
-        return validityOccupation(placement,0,0).getKey();
+        return validityOccupation(placement).getKey();
     }
 
     /**
@@ -164,29 +164,22 @@ public class FitGame {
         String newPiece;
 
 
-        // collect the used colors, so we don't need to iterate all the possibilities.
         Character[] usedColor = getUsedColor(placement);
 
-        // first check if the input placement plus a test color(which only occupy that location) is valid
         if (isPlacementValid(sortStringPlacement(placement+'*' + columns.toString() + rows.toString() + 'W'))) {
-            // then iterate through all the colors exclude the Test one.
+
             for (Color c : Color.values()) {
                 if (c == Color.TEST) continue;
-                // check if the board is empty or the current iterating color haven't been used.
-                if (placement.length() == 0 || !Arrays.asList(usedColor).contains(Character.toLowerCase(c.value))) {
-                    // iterate through every direction
+                if (placement.length() == 0||!Arrays.asList(usedColor).contains(Character.toLowerCase(c.value))) {
                     for (Direction d : Direction.values()) {
-                        // iterate each rows and columns
                         for (Integer y = 0; y < 5; y++) {
                             for (Integer x = 0; x < 10; x++) {
-                                // construct the new piece to be test.
                                 newPiece = c.value + x.toString() + y.toString() + d.value;
-
-                                var pair = validityOccupation(sortStringPlacement(placement+newPiece),rows,columns);
-                                var occupation = pair.getValue();
+                                var pair = validityOccupation(sortStringPlacement(placement+newPiece));
+                                var occupationArray = pair.getValue();
                                 var valid = pair.getKey();
                                 if (valid) {
-                                    if (occupation == 1) {
+                                    if (occupationArray[col][row] == 1) {
                                         result.add(newPiece);
                                     }
                                 }
@@ -226,7 +219,7 @@ public class FitGame {
      * @param placement A string of placement.
      * @return A Pair of contains the validity of placement and the occupation int array of array.
      */
-    public static Pair<Boolean, Integer> validityOccupation(String placement, Integer iRow, Integer iCol) {
+    public static Pair<Boolean, int[][]> validityOccupation(String placement) {
 
         //create a container for pieces parsed from string
         ArrayList<String> pieces = new ArrayList<>();
@@ -239,9 +232,9 @@ public class FitGame {
         //create a int array of array to illustrate the real occupation of pieces.
         int[][] occupationArray = new int[10][5];
 
-        Pair<Boolean, Integer> b = new Pair<>(false, null);
+        Pair<Boolean, int[][]> b = new Pair<>(false, null);
 
-        if (placement.length() == 0) return new Pair<>(true,0);
+        if (placement.length() == 0) return new Pair<>(true,new int[10][5]);
         else if (!isPlacementWellFormed(placement)) return b;
         else {
             for (String piece : pieces) {
@@ -1058,7 +1051,7 @@ public class FitGame {
             }
         }
 
-        return new Pair<>(true,occupationArray[iCol][iRow]);
+        return new Pair<>(true,occupationArray);
     }
 
 
@@ -1069,20 +1062,12 @@ public class FitGame {
      * @param placement A String placement.
      * @return A sorted String placement according to the alphabetical order of the color of pieces.
      */
+
     public static String sortStringPlacement(String placement) {
         List<String> grouped = new ArrayList<>();
-
-        if (placement.length() == 0 || placement.length() % 4 != 0)
-            throw new IllegalArgumentException("Incorrect placement String");
-        else {
-            for (int i = 0; i < placement.length(); i+=4) {
-                String piece = placement.substring(i,i+4);
-                if (isPiecePlacementWellFormed(piece))
-                grouped.add(piece);
-                else throw new IllegalArgumentException("Incorrect placement String");
-            }
+        for (int i = 0; i < placement.length(); i+=4) {
+            grouped.add(placement.substring(i,i+4));
         }
-
         grouped.sort(Comparator.comparing((String s) -> s.substring(0, 1).toLowerCase()));
         String sorted = "";
         for (String s : grouped) sorted += s;

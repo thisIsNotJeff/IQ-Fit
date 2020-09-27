@@ -35,7 +35,9 @@ public class PuzzlePieces {
     }
 
     public String toString() {
-        String s = this.color + String.valueOf(this.column) + this.row + this.direction;
+        String color = Character.toString(this.color.value);
+        String direction = Character.toString(this.direction.value);
+        String s = color + this.column + this.row + direction;
         return s;
     }
 
