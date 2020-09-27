@@ -15,14 +15,20 @@ public class sortStringPlacementTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testLengthOne() {
+    public void testEmptySpace() {
         sortStringPlacement(" ");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testAllString() {
-        sortStringPlacement("ssss");
+        sortStringPlacement("sssswwwwzzzzcccc");
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testHalfCorrect() { sortStringPlacement("g44wB22z");}
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIncorrectLength() {sortStringPlacement("r44NB22");}
 
     @Test
     public void testOnePiece() {

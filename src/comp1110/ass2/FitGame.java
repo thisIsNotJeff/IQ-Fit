@@ -184,7 +184,7 @@ public class FitGame {
                             var occupation = pair.getValue();
                             var valid = pair.getKey();
                             if (valid) {
-                                //to see of that place is taken.
+                                //to see if that place is taken.
                                 if (occupation[col][row] == 1)
                                     result.add(newPiece);
                             }
@@ -1130,8 +1130,6 @@ public class FitGame {
 
         return new Pair<>(true,occupationArray);
     }
-
-
 
 
 
