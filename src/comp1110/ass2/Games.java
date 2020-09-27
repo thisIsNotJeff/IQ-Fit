@@ -18,14 +18,13 @@ public class Games {
 
   /**
    * This array defines a set of 120 pre-defined FitGames.
-   *
    * There are 5 categories of Games, according to 5 difficulty levels, organized within the array as follows:
    *
    * Starter: 1-24
-   * Junior: 24-48
-   * Expert: 48-72
-   * Master: 72-96
-   * Wizard: 96-120
+   * Junior: 25-48
+   * Expert: 49-72
+   * Master: 73-96
+   * Wizard: 97-120
    */
   public static final Games[] SOLUTIONS = {
           // Starter level
@@ -163,51 +162,54 @@ public class Games {
    * The method selects a randomized Game from the 120 pre-defined Games,
    *
    * @param difficulty The difficulty of the game (0 - starter, 1 - junior, 2 - expert, 3 - master, 4 - wizard)
-   *
    * @return An Game at the appropriate level of difficulty.
    */
   public static Games newGames(int difficulty) {
-    if (difficulty == 0){return SOLUTIONS[(int)(Math.random()*24)];}
-    else if (difficulty == 1){return SOLUTIONS[(int)(Math.random()*24+24)];}
-    else if (difficulty == 2){return SOLUTIONS[(int)(Math.random()*24+48)];}
-    else if (difficulty == 3){return SOLUTIONS[(int)(Math.random()*24+72)];}
-    else if (difficulty == 4){return SOLUTIONS[(int)(Math.random()*24+96)];}
+    if (difficulty == 0){
+      return SOLUTIONS[(int)(Math.random()*24)];
+    }
+    else if (difficulty == 1){
+      return SOLUTIONS[(int)(Math.random()*24+24)];
+    }
+    else if (difficulty == 2){
+      return SOLUTIONS[(int)(Math.random()*24+48)];
+    }
+    else if (difficulty == 3){
+      return SOLUTIONS[(int)(Math.random()*24+72)];
+    }
+    else if (difficulty == 4){
+      return SOLUTIONS[(int)(Math.random()*24+96)];
+    }
     // assert difficulty >= 0 && difficulty <= 4;
     return null;
   }
 
   /**
-   *  This method tests if two Games are the same
+   * This method tests if two Games are the same
+   * @param other The Games object
+   * @return true if two Games are the same, false otherwise
    */
   public boolean equals(Games other){
-    if(this.number == other.number){} else return false;
-    if(this.objective == other.objective){} else return false;
-    if(this.placement == other.placement){} else return false;
+    if(this.number == other.number){
+    } else return false;
+    if(this.objective == other.objective){
+    } else return false;
+    if(this.placement == other.placement){
+    } else return false;
     return true;
   }
 
   /**
-   * @param game the game
+   * @param game the Game object
    * @return the difficulty level of the game (0 - starter, 1 - junior, 2 - expert, 3 - master, 4 - wizard, -1 - not a pre-defined game)
    */
   public static int getDifficulty(Games game) {
     for (int i = 0; i < Games.SOLUTIONS.length; i++) {
-      if (game.equals(Games.SOLUTIONS[i]))
+      if (game.equals(Games.SOLUTIONS[i])) {
         return i / (Games.SOLUTIONS.length/5);
+      }
     }
     return -1;
-  }
-
-  /**
-   * @param games the array contained numbers of games objective
-   * @return the number of games contained in the array
-   */
-  public static int countGames(Games[] games) {
-    return games.length;
-  }
-
-  public int getNumber() {
-    return number;
   }
 
 }
