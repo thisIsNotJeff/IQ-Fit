@@ -202,6 +202,27 @@ public class FitGame {
 
     }
 
+    public static Set<Pair<Integer,Integer>> getNeighbor(int row, int col) {
+        Set<Pair<Integer,Integer>> neighbor = new HashSet<>();
+//        neighbor.add(new Pair<>(row,col));
+
+
+        for (int i = 0; i < 4; i++) {
+            for (int rowUp = row; rowUp > -1; rowUp--) {
+                for (int colUp = col; colUp > -1; colUp--) {
+                    neighbor.add(new Pair<>(rowUp,colUp));
+                }
+            }
+
+            for (int rowDown = row; rowDown < 5; rowDown++) {
+                for (int colDown = col; colDown < 10; colDown++) {
+                    neighbor.add(new Pair<>(rowDown,colDown));
+                }
+            }
+        }
+        return neighbor;
+    }
+
 
     /**
      * Given a placement string, return all the used color in the placement.
