@@ -42,6 +42,8 @@ public class Board extends Application {
         path2[7] = "file:src/comp1110/ass2/gui/assets/R2.png";
         path2[8] = "file:src/comp1110/ass2/gui/assets/S2.png";
         path2[9] = "file:src/comp1110/ass2/gui/assets/Y2.png";
+        String[] color = {"blue", "green", "indigo", "limegreen", "navyblue", "orange",
+                          "pink", "red", "skyblue", "yellow"};
         Image image = new Image("file:src/comp1110/ass2/gui/assets/board.png");
         ImageView imageView = new ImageView();
         imageView.setImage(image);
@@ -50,7 +52,7 @@ public class Board extends Application {
         root.getChildren().add(imageView);
         Button[] piece = new Button[10];
         for(int i = 0; i< 10; i++) {
-            piece[i] = new Button("Piece" + (i + 1));
+            piece[i] = new Button(color[i]);
             piece[i].setLayoutX(50 + 80 * i);
             piece[i].setLayoutY(630);
             root.getChildren().add(piece[i]);
@@ -68,6 +70,7 @@ public class Board extends Application {
         /*the flip state of each piece
         use picture in path1 when equals to 1,use piece in path2 when equals to 2*/
         final int[] current_f = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+        final int[] current_r = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         Image origion = new Image(path1[current[0]]);//the screen shows the first puzzle piece at the beginning
         ImageView pieceView = new ImageView();
         pieceView.setImage(origion);
@@ -102,6 +105,7 @@ public class Board extends Application {
                         pieceView.setFitWidth(235);
                         pieceView.setFitHeight(110);
                     }
+                    pieceView.setRotate(current_r[num] * 90);
                     pieceView.setLayoutX(150);
                     pieceView.setLayoutY(450);
                     root.getChildren().add(pieceView);
@@ -132,6 +136,25 @@ public class Board extends Application {
                 else {
                     pieceView.setFitWidth(235);
                     pieceView.setFitHeight(110);
+                }
+                pieceView.setLayoutX(150);
+                pieceView.setLayoutY(450);
+                root.getChildren().add(pieceView);
+            }
+        });
+        rotate.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                int num = current[0];//find the piece showing on screen now
+                root.getChildren().remove(pieceView);
+                //change rotate state
+                if(current_r[num] < 3) {
+                    current_r[num] += 1;
+                    pieceView.setRotate(current_r[num] * 90);
+                }
+                else {
+                    current_r[num] = 0;
+                    pieceView.setRotate(0);
                 }
                 pieceView.setLayoutX(150);
                 pieceView.setLayoutY(450);
