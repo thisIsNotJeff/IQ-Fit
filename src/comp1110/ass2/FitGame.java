@@ -136,7 +136,7 @@ public class FitGame {
      * @return True if the placement sequence is valid
      */
     public static boolean isPlacementValid(String placement) {
-        return validityOccupation(placement,0,0).getKey();
+        return validityOccupation(placement).getKey();
     }
 
     /**
@@ -182,11 +182,11 @@ public class FitGame {
                                 // construct the new piece to be test.
                                 newPiece = c.value + x.toString() + y.toString() + d.value;
 
-                                var pair = validityOccupation(sortStringPlacement(placement+newPiece),rows,columns);
+                                var pair = validityOccupation(sortStringPlacement(placement+newPiece));
                                 var occupation = pair.getValue();
                                 var valid = pair.getKey();
                                 if (valid) {
-                                    if (occupation == 1) {
+                                    if (occupation[col][row] == 1) {
                                         result.add(newPiece);
                                     }
                                 }
@@ -247,7 +247,7 @@ public class FitGame {
      * @param placement A string of placement.
      * @return A Pair of contains the validity of placement and the occupation int array of array.
      */
-    public static Pair<Boolean, Integer> validityOccupation(String placement, Integer iRow, Integer iCol) {
+    public static Pair<Boolean, int[][]> validityOccupation(String placement) {
 
         //create a container for pieces parsed from string
         ArrayList<String> pieces = new ArrayList<>();
@@ -260,9 +260,9 @@ public class FitGame {
         //create a int array of array to illustrate the real occupation of pieces.
         int[][] occupationArray = new int[10][5];
 
-        Pair<Boolean, Integer> b = new Pair<>(false, null);
+        Pair<Boolean, int[][]> b = new Pair<>(false, null);
 
-        if (placement.length() == 0) return new Pair<>(true,0);
+        if (placement.length() == 0) return new Pair<>(true,occupationArray);
         else if (!isPlacementWellFormed(placement)) return b;
         else {
             for (String piece : pieces) {
@@ -1079,7 +1079,7 @@ public class FitGame {
             }
         }
 
-        return new Pair<>(true,occupationArray[iCol][iRow]);
+        return new Pair<>(true,occupationArray);
     }
 
 
