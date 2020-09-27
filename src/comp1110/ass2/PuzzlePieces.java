@@ -1,10 +1,10 @@
 package comp1110.ass2;
 
-public class puzzlePieces {
-    public Direction direction;
+public class PuzzlePieces {
     public Color color;
     public int row;
     public int column;
+    public Direction direction;
 
     /**
      * Constructor.
@@ -13,7 +13,7 @@ public class puzzlePieces {
      * @param row the row position of this puzzle is placed
      * @param column the column position of this puzzle is placed
      */
-    public puzzlePieces(Direction direction, Color color, int row, int column){
+    public PuzzlePieces(Direction direction, Color color, int row, int column){
         this.direction=direction;
         this.color=color;
         this.row=row;
@@ -32,6 +32,11 @@ public class puzzlePieces {
      */
     public Color getColor() {
         return color;
+    }
+
+    public String toString() {
+        String s = this.color + String.valueOf(this.column) + this.row + this.direction;
+        return s;
     }
 
 }

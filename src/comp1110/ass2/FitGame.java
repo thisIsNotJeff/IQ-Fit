@@ -224,7 +224,7 @@ public class FitGame {
         //create a container for pieces parsed from string
         ArrayList<String> pieces = new ArrayList<>();
 
-        for (int i = 0; i < placement.length(); i = i + 4) {
+        for (int i = 0; i < placement.length() - 3; i = i + 4) {
             pieces.add(placement.substring(i, i + 4));
         }
 
@@ -252,7 +252,6 @@ public class FitGame {
 
 
                 if (charColour == 'b') {
-
                     if (charDirection == 'N') {
                         if ((column > 6) || (row > 3)) return b;
                         else {
