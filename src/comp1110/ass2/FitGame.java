@@ -161,9 +161,9 @@ public class FitGame {
 
         Integer columns = col;
         Integer rows = row;
-        String newPiece;
+        String newPiece = "";
         // get all the possible locations
-        var neighbor = getNeighbor(row, col);
+        var candidate = possibleLocation(col, row);
 
         // collect the used colors, so we don't need to iterate all the possibilities.
         Character[] usedColor = getUsedColor(placement);
@@ -173,13 +173,15 @@ public class FitGame {
             // then iterate through all the colors exclude the Test one.
             for (Color c : Color.values()) {
                 if (c == Color.TEST) continue;
+
                 // check if the board is empty or the current iterating color haven't been used.
                 if (placement.length() == 0 || !Arrays.asList(usedColor).contains(Character.toLowerCase(c.value))) {
+
                     // iterate through every direction
                     for (Direction d : Direction.values()) {
                         //iterate through every possible location.
-                        for (Pair<Integer, Integer> p : neighbor) {
-                            newPiece = c.value + p.getValue().toString() + p.getKey().toString() + d.value;
+                        for (Pair<Integer, Integer> p : candidate) {
+                            newPiece = c.value + p.getKey().toString() + p.getValue().toString() + d.value;
                             var pair = validityOccupation(sortStringPlacement(placement + newPiece));
                             var occupation = pair.getValue();
                             var valid = pair.getKey();
@@ -196,52 +198,50 @@ public class FitGame {
 
         if (result.size() == 0) return null;
         else return result;
-
     }
-    /**
-     * Given a row and column, return all the coordinates between row±3 (between 0-4) and column±3 (between 0-9)
-     *
-     * @param row The current row.
-     * @param col The current column.
-     * @return A set of pairs with key represents the row, value represents the column.
-     */
-    public static Set<Pair<Integer, Integer>> getNeighbor(int row, int col) {
-        Set<Pair<Integer, Integer>> neighbor = new HashSet<>();
-        int rowEnd = 0;
-        int rowStart = 0;
 
-        // find out the end location of row.
-        for (int i = row; i < row + 4; i++) {
-            if (i > 4) break;
-            else rowEnd = i;
+    public static Set<Pair<Integer, Integer>> possibleLocation(int col, int row) {
+        Set<Pair<Integer, Integer>> result = new HashSet<>();
+
+        if (row == 0)
+            getRange(col, row, 1, 0, result);
+        else if (row == 1)
+            getRange(col, row, 1, 1, result);
+        else if (row == 2)
+            getRange(col, row, 1, 2, result);
+        else if (row == 3) {
+            int newRow = row-1;
+            getRange(col, newRow, 1, 2, result);
+        } else {
+            int newRow = row-2;
+            getRange(col, newRow, 1, 1, result);
         }
-        // find out the start location of row.
-        for (int i = row; i > row - 4; i--) {
+
+        getRange(col, row, 3, 1, result);
+
+        return result;
+    }
+
+
+    public static void getRange(int col, int row, int colChange, int rowChange, Set<Pair<Integer,Integer>> toAdd) {
+        int rowStart = 0;
+        int colStart = 0;
+
+        for (int i = row; i > row - (rowChange+1); i--) {
             if (i < 0) break;
             else rowStart = i;
         }
 
-        int colEnd = 0;
-        int colStart = 0;
-        // find out the end location of column.
-        for (int i = col; i < col + 4; i++) {
-            if (i > 9) break;
-            else colEnd = i;
-        }
-
-        // find out the start location of column.
-        for (int i = col; i > col - 4; i--) {
+        for (int i = col; i > col - (colChange+1); i--) {
             if (i < 0) break;
             else colStart = i;
         }
-        // add all the coordinates between rowStart to rowEnd and colStart to colEnd.
-        for (int i = rowStart; i < rowEnd + 1; i++) {
-            for (int j = colStart; j < colEnd + 1; j++) {
-                neighbor.add(new Pair<>(i, j));
+
+        for (int i = rowStart; i < row + 1; i++) {
+            for (int j = colStart; j < col + 1; j++) {
+                toAdd.add(new Pair<>(j,i));
             }
         }
-
-        return neighbor;
     }
 
     /**
@@ -1143,13 +1143,34 @@ public class FitGame {
      */
 
     public static String getSolution(String challenge) {
-        for (int i = 0; i < Games.SOLUTIONS.length; i++) {
-            if (challenge == Games.SOLUTIONS[i].objective) {
-                return Games.SOLUTIONS[i].placement;
-            }
+        var occupationArray = validityOccupation(challenge).getValue();
+        Set<Pair<Integer,Integer>> emptyLocation = new HashSet<>();
+        Set<Pair<Integer,Integer>> priorityLocation = new HashSet<>();
+//        for (int i = 1; i < 9; i++) {
+//            for (int j = 1; j < 4; j++) {
+//                if (occupationArray[i][j] == 0) emptyLocation.add(new Pair<>(i,j));
+//            }
+//        }
+
+        for (int i = 0; i < 10; i++) {
+            priorityLocation.add(new Pair<>(i,0));
+            priorityLocation.add(new Pair<>(i,4));
         }
 
-        return null;  // FIXME Task 9: determine the solution to the game, given a particular challenge
+        for (int j = 0; j < 5 ; j++) {
+            priorityLocation.add(new Pair<>(0,j));
+            priorityLocation.add(new Pair<>(4,j));
+        }
+
+        for (Pair<Integer,Integer> p : priorityLocation) {
+
+        }
+
+
+
+
+
+        return null;
     }
 
 
