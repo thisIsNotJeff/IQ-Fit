@@ -1,14 +1,18 @@
 package comp1110.ass2.gui;
 
+import comp1110.ass2.Games;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Board extends Application {
@@ -163,9 +167,9 @@ public class Board extends Application {
         });
     }
 
-    // FIXME Task 8: Implement challenges (you may use assets provided for you in comp1110.ass2.gui.assets)
 
-    
+
+
 
     // FIXME Task 10: Implement hints (should become visible when the user presses '/' -- see gitlab issue for details)
 
@@ -176,7 +180,106 @@ public class Board extends Application {
         primaryStage.setTitle("Fit Game");
         Scene scene = new Scene(root, BOARD_WIDTH, BOARD_HEIGHT);
         basic();
+        implementChallenge();
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
+
+
+
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    // FIXME Task 8: Implement challenges (you may use assets provided for you in comp1110.ass2.gui.assets)
+
+    private void implementChallenge() {
+
+        TextField challengeTextField = new TextField();
+        challengeTextField.setPrefWidth(30);
+        challengeTextField.setPromptText("0 ~ 4");
+
+        Label labal = new Label("Difficulty Level:");
+        Button ChallengeButton = new Button("Challenge");
+
+
+        ChallengeButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                makePlacement(Games.newGames(Integer.parseInt(challengeTextField.getText())).objective);
+                challengeTextField.clear();
+            }
+        });
+        VBox vb = new VBox();
+        vb.getChildren().addAll(labal, challengeTextField, ChallengeButton);
+        vb.setSpacing(10);
+        vb.setLayoutX(690);
+        vb.setLayoutY(500);
+        root.getChildren().add(vb);
+    }
+
+    private void makePlacement(String placement) {
+
+        Image image = new Image("file:src/comp1110/ass2/gui/assets/board.png");
+        ImageView imageView = new ImageView();
+        imageView.setImage(image);
+        imageView.setFitWidth(700);
+        imageView.setFitHeight(370);
+        root.getChildren().add(imageView);
+        Image[] puzzle = new Image[placement.length() / 4];
+        ImageView[] pview = new ImageView[placement.length() / 4];
+        int n = 0;
+        String num;
+        for(int i = 0; i < placement.length(); i += 4) {
+            int biasx = 0;
+            int biasy = 0;
+            char t = placement.charAt(i);
+            int c = placement.charAt(i + 1) - '0';
+            int r = placement.charAt(i + 2) - '0';
+            char o = placement.charAt(i + 3);
+            if((t == 'b')||(t == 'B')||(t == 'o')||(t == 'O')||(t == 'p')||
+                    (t == 'P')||(t == 'r')||(t == 'R')||(t == 's')||(t == 'S')||(t == 'y')||(t == 'Y')) {
+                if(Character.isLowerCase(t)) num = "1";
+                else num = "2";
+                puzzle[n] = new Image("file:src/comp1110/ass2/gui/assets/" + String.valueOf(t) + num + ".png");
+                pview[n] = new ImageView();
+                pview[n].setImage(puzzle[n]);
+                pview[n].setFitWidth(235);
+                pview[n].setFitHeight(110);
+                if((o == 'E')|(o == 'W')) {
+                    if(o == 'E')  pview[n].setRotate(90);
+                    else pview[n].setRotate(270);
+                    biasx = -60;
+                    biasy = 60;
+                }
+                if(o == 'S') pview[n].setRotate(180);
+                pview[n].setLayoutX(50 + 60*c + biasx);
+                pview[n].setLayoutY(30 + 60*r + biasy);
+                root.getChildren().add(pview[n]);
+            }
+            else {
+                if(Character.isLowerCase(t)) num = "1";
+                else num = "2";
+                puzzle[n] = new Image("file:src/comp1110/ass2/gui/assets/" + String.valueOf(t) + num + ".png");
+                pview[n] = new ImageView();
+                pview[n].setImage(puzzle[n]);
+                pview[n].setFitWidth(175);
+                pview[n].setFitHeight(110);
+                if((o == 'E')|(o == 'W')) {
+                    if(o == 'E')  pview[n].setRotate(90);
+                    else pview[n].setRotate(270);
+                    biasx = -30;
+                    biasy = 30;
+                }
+                if(o == 'S') pview[n].setRotate(180);
+                pview[n].setLayoutX(50 + 60*c + biasx);
+                pview[n].setLayoutY(30 + 60*r + biasy);
+                root.getChildren().add(pview[n]);
+            }
+        }
+
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
 }
