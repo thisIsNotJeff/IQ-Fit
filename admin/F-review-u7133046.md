@@ -4,7 +4,8 @@ Reviewed by: <Qinrui Cheng>, <u7133046>
 
 Reviewing code written by: <Yuxuan Hu> <u7167529>
 
-Component: [Viewer.java] (https://gitlab.cecs.anu.edu.au/u7133046/comp1110-ass2-tue15g/-/blob/master/src/comp1110/ass2/gui/Viewer.java#L30-117) the simple viewer from the task #4.
+Component: 
+- [Viewer.java](https://gitlab.cecs.anu.edu.au/u7133046/comp1110-ass2-tue15g/-/blob/master/src/comp1110/ass2/gui/Viewer.java#L30-117) the simple viewer from the task #4.
 
 ### Comments 
 
