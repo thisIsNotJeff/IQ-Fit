@@ -24,6 +24,7 @@ public class FitGame {
      *
      * @param piecePlacement A string describing a piece placement
      * @return True if the piece placement is well-formed
+     * @author Boyang Gao
      */
 
     static boolean isPiecePlacementWellFormed(String piecePlacement) {
@@ -67,7 +68,7 @@ public class FitGame {
      *
      * @param placement A string describing a placement of one or more pieces
      * @return True if the placement is well-formed
-     * @author Boyang Gao
+     * @author Qinrui Cheng
      */
     public static boolean isPlacementWellFormed(String placement) {
         boolean flag = true;
