@@ -9,6 +9,7 @@ import java.util.*;
  * <p>
  * The game is based directly on Smart Games' IQ-Fit game
  * (https://www.smartgames.eu/uk/one-player-games/iq-fit)
+ * @author Boyang Gao, Yuxuan Hu, Qinrui Cheng
  */
 public class FitGame {
 
@@ -23,6 +24,7 @@ public class FitGame {
      *
      * @param piecePlacement A string describing a piece placement
      * @return True if the piece placement is well-formed
+     * @author Boyang Gao
      */
 
     static boolean isPiecePlacementWellFormed(String piecePlacement) {

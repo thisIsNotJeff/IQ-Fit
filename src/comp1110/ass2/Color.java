@@ -3,7 +3,7 @@ package comp1110.ass2;
 /**
  * This enumeration type represents the 9 distinct color each
  * corresponding a distinct playing shape in IQFit game.
- *
+ * @author Boyang Gao, Yuxuan Hu, Qinrui Cheng
  */
 
 public enum Color {

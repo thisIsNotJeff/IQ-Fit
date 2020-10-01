@@ -4,6 +4,10 @@ import javafx.util.Pair;
 
 import java.util.Arrays;
 
+/**
+ * @author Yuxuan Hu
+ */
+
 public class GameBoard {
     public int[][] occupationArray = new int[10][5];
 
@@ -13,9 +17,6 @@ public class GameBoard {
      */
     public GameBoard(int difficulty) {
     }
-
-
-
 
     /**
      * given a puzzle and a position represented by an array,
