@@ -68,7 +68,8 @@ public class FitGame {
      *
      * @param placement A string describing a placement of one or more pieces
      * @return True if the placement is well-formed
-     * @author Qinrui Cheng
+     *
+     * Author: Qinrui Cheng u7133046.
      */
     public static boolean isPlacementWellFormed(String placement) {
         boolean flag = true;
@@ -157,7 +158,10 @@ public class FitGame {
      * @param col      The location's column.
      * @param row      The location's row.
      * @return A set of all viable piece placements, or null if there are none.
+     *
+     * Author: Qinrui Cheng u7133046.
      */
+
     static Set<String> getViablePiecePlacements(String placement, int col, int row) {
 
         Set<String> result = new HashSet<>();
@@ -173,6 +177,7 @@ public class FitGame {
 
         // first check if the input placement plus a test color(which only occupy that location) is valid
         if (isPlacementValid(sortStringPlacement(placement + '*' + columns.toString() + rows.toString() + 'W'))) {
+
             // then iterate through all the colors exclude the Test one.
             for (Color c : Color.values()) {
                 if (c == Color.TEST) continue;
@@ -182,14 +187,16 @@ public class FitGame {
 
                     // iterate through every direction
                     for (Direction d : Direction.values()) {
+
                         //iterate through every possible location.
                         for (Pair<Integer, Integer> p : candidate) {
                             newPiece = c.value + p.getKey().toString() + p.getValue().toString() + d.value;
                             var pair = validityOccupation(sortStringPlacement(placement + newPiece));
                             var occupation = pair.getValue();
                             var valid = pair.getKey();
+                            // if the board state is valid after the putting the new piece
                             if (valid) {
-                                //to see if that place is taken.
+                                //to see if the desired location is covered.
                                 if (occupation[col][row] == 1)
                                     result.add(newPiece);
                             }
@@ -203,9 +210,21 @@ public class FitGame {
         else return result;
     }
 
+    /**
+     * Given a column and a row, return all the possible locations that pieces in the IQ FIT can put.
+     *
+     * @param col Current column.
+     * @param row Current row.
+     * @return A set of all the possible coordinates from the given row and column.
+     *
+     * Author: Qinrui Cheng u7133046.
+     */
+
     public static Set<Pair<Integer, Integer>> possibleLocation(int col, int row) {
         Set<Pair<Integer, Integer>> result = new HashSet<>();
 
+        /* these are all the possible locations for pieces on the direction EAST or WEST can put.
+        The possible locations depends on the number of rows */
         if (row == 0)
             getRange(col, row, 1, 0, result);
         else if (row == 1)
@@ -220,26 +239,42 @@ public class FitGame {
             getRange(col, newRow, 1, 1, result);
         }
 
+        // add all the possible locations for pieces in the direction of SOUTH or NORTH can put.
         getRange(col, row, 3, 1, result);
 
         return result;
     }
 
+    /**
+     * Given current column, current row, the number of column and row you want to reduce, return all the coordinates from the reduced
+     * column and row to the current ones to the given set.
+     *
+     * @param col Current column.
+     * @param row Current row.
+     * @param colChange Number of columns to reduce.
+     * @param rowChange Number of rows to change.
+     * @param toAdd The set to add all coordinates from the calculated range.
+     *
+     * Author: Qinrui Cheng u7133046.
+     */
 
     public static void getRange(int col, int row, int colChange, int rowChange, Set<Pair<Integer,Integer>> toAdd) {
         int rowStart = 0;
         int colStart = 0;
 
+        //figure out the start location of row.
         for (int i = row; i > row - (rowChange+1); i--) {
             if (i < 0) break;
             else rowStart = i;
         }
 
+        //figure out the start location of column.
         for (int i = col; i > col - (colChange+1); i--) {
             if (i < 0) break;
             else colStart = i;
         }
 
+        //add all the coordinates form colStart to col and from rowStart to row.
         for (int i = rowStart; i < row + 1; i++) {
             for (int j = colStart; j < col + 1; j++) {
                 toAdd.add(new Pair<>(j,i));
@@ -247,12 +282,16 @@ public class FitGame {
         }
     }
 
+
     /**
      * Given a placement string, return all the used color in the placement.
      *
      * @param placement A string of placement.
      * @return An array of used color.
+     *
+     * Author: Qinrui Cheng u7133046.
      */
+
     public static Character[] getUsedColor(String placement) {
         ArrayList<Character> used = new ArrayList<>();
         for (int i = 0; i < placement.length(); i = i+4) {
@@ -266,7 +305,10 @@ public class FitGame {
      *
      * @param placement A String placement.
      * @return A sorted String placement according to the alphabetical order of the color of pieces.
+     *
+     * Author: Qinrui Cheng u7133046.
      */
+
     public static String sortStringPlacement(String placement) {
         List<String> grouped = new ArrayList<>();
 
@@ -284,10 +326,10 @@ public class FitGame {
         }
         // sort the ArrayList of String pieces according to their color.
         grouped.sort(Comparator.comparing((String s) -> s.substring(0, 1).toLowerCase()));
-        String sorted = "";
+        StringBuilder sorted = new StringBuilder();
         // recompose the placement String.
-        for (String s : grouped) sorted += s;
-        return sorted;
+        for (String s : grouped) sorted.append(s);
+        return sorted.toString();
     }
 
 
@@ -298,6 +340,8 @@ public class FitGame {
      *
      * @param placement A string of placement.
      * @return A Pair of contains the validity of placement and the occupation int array of array.
+     *
+     * Author: Yuxuan Hu  u7167529 / Qinrui Cheng u7133046.
      */
     public static Pair<Boolean, int[][]> validityOccupation(String placement) {
 
@@ -1173,7 +1217,8 @@ public class FitGame {
 
 
 
-        return null;
+
+        return null; // FIXME Task 9: determine the solution to the game, given a particular challenge
     }
 
 
