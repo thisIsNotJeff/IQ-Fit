@@ -10,7 +10,7 @@ declaration: >-
 contributions:
   - uid: 
     contribution: 33
-  - uid:
+  - uid: u7167529
     contribution: 33
   - uid: u7175363
     contribution: 33
@@ -20,7 +20,7 @@ contributions:
 signatures:
   - name:
     uid:
-  - name:
-    uid:
+  - name: Yuxuan Hu
+    uid: u7167529
   - name: Boyang Gao
     uid: u7175363
