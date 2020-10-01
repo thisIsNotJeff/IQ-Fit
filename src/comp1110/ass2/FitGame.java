@@ -72,55 +72,36 @@ public class FitGame {
      * Author: Qinrui Cheng u7133046.
      */
     public static boolean isPlacementWellFormed(String placement) {
-        boolean flag = true;
 
         // check if input satisfies condition 1.
         if (placement.length() % 4 == 0
                 && placement.length() >= 4
                 && placement.length() <= 40) {
 
-            ArrayList<String> grouped = new ArrayList<>();
+            //ArrayList<String> grouped = new ArrayList<>();
 
-            // group input String as an ArrayList of 4 chars as it's element.
-            for (int i = 0; i < placement.length(); i++) {
-                grouped.add(placement.substring(i,i+4));
-                i = i + 3;
-            }
-            // check if the input satisfies condition 2.
-            for (String s : grouped) {
-                if (!isPiecePlacementWellFormed(s)) {
-                    flag = false;
-                    break;
-                }
+            StringBuilder shapes = new StringBuilder();
+
+            // group input String and only preserve the shapes in lower cases. And check if the input satisfies condition 2.
+            for (int i = 0; i < placement.length(); i+=4) {
+                String pieces = placement.substring(i,i+4);
+                if (isPiecePlacementWellFormed(pieces))
+                    shapes.append(pieces.substring(0,1).toLowerCase());
+                else return false;
             }
 
-            if (flag) {
-                StringBuilder shapes = new StringBuilder();
-                // flatten the ArrayList into a String which only preserves shapes from the input.
-                for (String s : grouped) {
-                    shapes.append(s.toLowerCase().charAt(0));
-                }
+            // check if the input satisfies condition 3.
+            if (shapes.chars().distinct().count() == shapes.length()) {
 
-                // check if the input satisfies condition 3.
-                if (shapes.chars().distinct().count() == shapes.length()) {
+                char[] sortedShapes = shapes.toString().toCharArray();
+                //sort the array of shapes according to the alphabetical order.
+                Arrays.sort(sortedShapes);
 
-                    char[] unsortedShapes = shapes.toString().toLowerCase().toCharArray();
-                    //sort the array of shapes according to the alphabetical order.
-                    Arrays.sort(unsortedShapes);
+                //check if the input satisfies the last condition.
+                return Arrays.equals(shapes.toString().toCharArray(), sortedShapes);//shapes.toString().equals(sortedShape.toString());
 
-                    StringBuilder sortedShape = new StringBuilder();
-
-                    for (char c : unsortedShapes) sortedShape.append(c);
-                    //check if the input satisfies the last condition.
-                    if (!shapes.toString().toLowerCase().equals(sortedShape.toString())) {
-                        flag = false;
-                    }
-
-                } else flag = false;
-            }
-        } else flag = false;
-
-        return flag;
+            } else return false;
+        } else return false;
     }
 
 
