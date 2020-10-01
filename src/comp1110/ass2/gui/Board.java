@@ -15,6 +15,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+/**
+ * @author Yuxuan Hu completed all codes in this file except implementChallenge function, which is authored by Boyang Gao
+ */
+
 public class Board extends Application {
 
     private static final int BOARD_WIDTH = 933;
@@ -186,32 +190,29 @@ public class Board extends Application {
     }
 
 
-
-
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
     // FIXME Task 8: Implement challenges (you may use assets provided for you in comp1110.ass2.gui.assets)
+
 
     private void implementChallenge() {
 
-        TextField challengeTextField = new TextField();
-        challengeTextField.setPrefWidth(30);
-        challengeTextField.setPromptText("0 ~ 4");
+        TextField ChallengeTextField = new TextField();
+        ChallengeTextField.setPrefWidth(30);
+        ChallengeTextField.setPromptText("0 ~ 4");
+        ChallengeTextField.setPrefColumnCount(1);
 
-        Label labal = new Label("Difficulty Level:");
+        Label ChallengeTextLabel = new Label("Difficulty Level:");
         Button ChallengeButton = new Button("Challenge");
-
 
         ChallengeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                makePlacement(Games.newGames(Integer.parseInt(challengeTextField.getText())).objective);
-                challengeTextField.clear();
+                makePlacement(Games.newGames(Integer.parseInt(ChallengeTextField.getText())).objective);
+                ChallengeTextField.clear();
             }
         });
+
         VBox vb = new VBox();
-        vb.getChildren().addAll(labal, challengeTextField, ChallengeButton);
+        vb.getChildren().addAll(ChallengeTextLabel, ChallengeTextField, ChallengeButton);
         vb.setSpacing(10);
         vb.setLayoutX(690);
         vb.setLayoutY(500);
@@ -280,6 +281,5 @@ public class Board extends Application {
 
     }
 
-    /*----------------------------------------------------------------------------------------------------------------*/
 
 }

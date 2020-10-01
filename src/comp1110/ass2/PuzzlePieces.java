@@ -1,5 +1,9 @@
 package comp1110.ass2;
 
+/**
+ * @author Boyang Gao, Yuxuan Hu, Qinrui Cheng
+ */
+
 public class PuzzlePieces {
     public Color color;
     public int row;

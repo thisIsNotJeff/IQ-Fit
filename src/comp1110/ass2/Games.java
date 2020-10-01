@@ -2,6 +2,11 @@ package comp1110.ass2;
 
 import java.util.*;
 
+/**
+ * @author Boyang Gao added three functions, newGames, equals, getDifficulty to the class
+ * Codes without specifying author are authored by: all group members
+ */
+
 public class Games {
   public int number;
   public String objective;
@@ -160,9 +165,9 @@ public class Games {
 
   /**
    * The method selects a randomized Game from the 120 pre-defined Games,
-   *
    * @param difficulty The difficulty of the game (0 - starter, 1 - junior, 2 - expert, 3 - master, 4 - wizard)
    * @return An Game at the appropriate level of difficulty.
+   * @Anuthor Boyang Gao
    */
   public static Games newGames(int difficulty) {
     if (difficulty == 0){
@@ -188,6 +193,7 @@ public class Games {
    * This method tests if two Games are the same
    * @param other The Games object
    * @return true if two Games are the same, false otherwise
+   * @author Boyang Gao
    */
   public boolean equals(Games other){
     if(this.number == other.number){
@@ -202,6 +208,7 @@ public class Games {
   /**
    * @param game the Game object
    * @return the difficulty level of the game (0 - starter, 1 - junior, 2 - expert, 3 - master, 4 - wizard, -1 - not a pre-defined game)
+   * @author Boyang Gao
    */
   public static int getDifficulty(Games game) {
     for (int i = 0; i < Games.SOLUTIONS.length; i++) {
