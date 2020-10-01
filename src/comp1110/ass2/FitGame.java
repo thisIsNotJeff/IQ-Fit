@@ -341,7 +341,7 @@ public class FitGame {
      * @param placement A string of placement.
      * @return A Pair of contains the validity of placement and the occupation int array of array.
      *
-     *
+     * Author: Yuxuan Hu  u7167529 / Qinrui Cheng u7133046.
      */
     public static Pair<Boolean, int[][]> validityOccupation(String placement) {
 
