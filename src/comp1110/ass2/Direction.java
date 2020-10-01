@@ -8,7 +8,7 @@ package comp1110.ass2;
 
 public enum Direction {
 
-    NORTH('N'), EAST('E'), SOUTH('S'), WEST('W');
+    NORTH('N'), SOUTH('S'), EAST('E'), WEST('W');
 
     public char value;
 
