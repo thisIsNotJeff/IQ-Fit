@@ -127,7 +127,6 @@ public class Board extends Application {
                     for(int i = 0; i < 10; i++) {
                         if((current[0] != number)&&(on_board[number] == 0)) root.getChildren().remove(this);
                     }
-                    System.out.println(Arrays.deepToString(occupationArray));
                 });
             }
             private void adjust() {
