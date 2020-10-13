@@ -25,7 +25,7 @@ public class GameBoard {
      * @return return true if there is not overlap or the puzzle will not be outside
      * of the board. Otherwise return false.
      */
-    public static boolean canBePut(PuzzlePieces puzzle, int[][] occupationArray) {
+    /*public static boolean canBePut(PuzzlePieces puzzle, int[][] occupationArray) {
         String pos = puzzle.toString();
         if(!FitGame.validityOccupation(pos).getKey()) return false;
         int[][] previous_occupation;
@@ -37,14 +37,52 @@ public class GameBoard {
                 previous_occupation[i][j] += puzzle_occupation[i][j];
             }
         }
-        for(int i = 0; i < 10; i++) {
-            for(int j = 0; j < 5; j++) {
-                if(occupationArray[i][j] == 2) {
+        for(int m = 0; m < 10; m++) {
+            for(int n = 0; n < 5; n++) {
+                if(occupationArray[m][n] == 2) {
+                    for(int i = 0; i < 10; i++) {
+                        for(int j = 0; j < 5; j++) {
+                            previous_occupation[i][j] -= puzzle_occupation[i][j];
+                        }
+                    }
                     return false;
                 }
             }
         }
         return true;
+    }*/
+    public static boolean canBePut(PuzzlePieces puzzle, int[][] occupationArray) {
+        String pos = puzzle.toString();
+        if(!FitGame.validityOccupation(pos).getKey()) return false;
+        int[][] puzzle_occupation;
+        puzzle_occupation = FitGame.validityOccupation(puzzle.toString()).getValue();
+        for(int i = 0; i < 10; i++) {
+            for(int j = 0; j < 5; j++) {
+                occupationArray[i][j] += puzzle_occupation[i][j];
+            }
+        }
+        for(int m = 0; m < 10; m++) {
+            for(int n = 0; n < 5; n++) {
+                if(occupationArray[m][n] == 2) {
+                    for(int i = 0; i < 10; i++) {
+                        for(int j = 0; j < 5; j++) {
+                            occupationArray[i][j] -= puzzle_occupation[i][j];
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    public static void removePiece(PuzzlePieces puzzle, int[][] occupationArray) {
+        int[][] puzzle_occupation;
+        puzzle_occupation = FitGame.validityOccupation(puzzle.toString()).getValue();
+        for(int i = 0; i < 10; i++) {
+            for(int j = 0; j < 5; j++) {
+                occupationArray[i][j] -= puzzle_occupation[i][j];
+            }
+        }
     }
 
     public int[][] getPos() {

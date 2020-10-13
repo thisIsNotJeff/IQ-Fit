@@ -1,6 +1,6 @@
 package comp1110.ass2.gui;
 
-import comp1110.ass2.Games;
+import comp1110.ass2.*;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -15,6 +15,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.sql.SQLOutput;
+
 /**
  * @author Yuxuan Hu completed all codes in this file except implementChallenge function, which is authored by Boyang Gao
  */
@@ -24,6 +26,7 @@ public class Board extends Application {
     private static final int BOARD_WIDTH = 933;
     private static final int BOARD_HEIGHT = 700;
     private final Group root = new Group();
+
     // FIXME Task 7: Implement a basic playable Fix Game in JavaFX that only allows pieces to be placed in valid places
     void basic() {
         int[] picture = new int[10];
@@ -58,6 +61,212 @@ public class Board extends Application {
         imageView.setFitWidth(700);
         imageView.setFitHeight(370);
         root.getChildren().add(imageView);
+        //number of piece showing on screen, show the first puzzle piece in beginning
+        final int[] current = {0};
+        /*the flip state of each piece
+        use picture in path1 when equals to 1,use piece in path2 when equals to 2*/
+        final int[] current_f = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+        final int[] current_r = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        final int[] on_board = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //1 if the piece is on the board
+        int[][] occupationArray = new int[10][5];
+        for(int i = 0; i< 10; i++) {
+            for(int j = 0; j< 5; j++) {
+                occupationArray[i][j] = 0;
+            }
+        }
+        class DraggablePiece extends ImageView {
+            double mouseX0, mouseX1, mouseX2;
+            double mouseY0, mouseY1, mouseY2;
+            double movementX;
+            double movementY;
+            int number; //number of this piece
+            int col;
+            int row;
+
+            DraggablePiece(int number) {
+                this.number = number;
+                /* event handlers */
+                setOnMousePressed(event -> {      // mouse press indicates begin of drag
+                    mouseX1 = event.getSceneX();
+                    mouseY1 = event.getSceneY();
+                    mouseX0 = mouseX1;
+                    mouseY0 = mouseY1;
+                    Color[] color1 = {Color.blue, Color.green, Color.indigo, Color.limegreen, Color.navyblue,
+                            Color.orange, Color.pink, Color.red, Color.skyblue, Color.yellow};
+                    Color[] color2 = {Color.BLUE, Color.GREEN, Color.INDIGO, Color.LIMEGREEN, Color.NAVYBLUE,
+                            Color.ORANGE, Color.PINK, Color.RED, Color.SKYBLUE, Color.YELLOW};
+                    Color c;
+                    Direction d;
+                    if(current_r[number] == 0) d = Direction.NORTH;
+                    else if(current_r[number] == 1) d = Direction.EAST;
+                    else if(current_r[number] == 2) d = Direction.SOUTH;
+                    else d = Direction.WEST;
+                    if(current_f[number] == 1) c = color1[number];
+                    else c = color2[number];
+                    if(on_board[number] == 1){
+                        PuzzlePieces p = new PuzzlePieces(d, c, row, col);
+                        GameBoard.removePiece(p, occupationArray);
+                    }
+                });
+                setOnMouseDragged(event -> {      // mouse is being dragged
+                    //  can be legally moved.
+                    movementX = event.getSceneX() - mouseX1;
+                    movementY = event.getSceneY() - mouseY1;
+                    setLayoutX(getLayoutX() + movementX);
+                    setLayoutY(getLayoutY() + movementY);
+                    mouseX1 = event.getSceneX();
+                    mouseY1 = event.getSceneY();
+                    //event.consume();
+                });
+                setOnMouseReleased(event -> {     // drag is complete
+                    mouseX2 = event.getSceneX();
+                    mouseY2 = event.getSceneY();
+                    on_board[current[0]] = 1;
+                    adjust();
+                    for(int i = 0; i < 10; i++) {
+                        if((current[0] != number)&&(on_board[number] == 0)) root.getChildren().remove(this);
+                    }
+                });
+            }
+
+            private void adjust() {
+                int x, y;
+                double biasX = 0;
+                double biasY = 0;
+                double ltX;
+                double ltY;
+                Color[] color1 = {Color.blue, Color.green, Color.indigo, Color.limegreen, Color.navyblue,
+                        Color.orange, Color.pink, Color.red, Color.skyblue, Color.yellow};
+                Color[] color2 = {Color.BLUE, Color.GREEN, Color.INDIGO, Color.LIMEGREEN, Color.NAVYBLUE,
+                        Color.ORANGE, Color.PINK, Color.RED, Color.SKYBLUE, Color.YELLOW};
+                Color c;
+                Direction d;
+                if(current_r[number] == 0) d = Direction.NORTH;
+                else if(current_r[number] == 1) d = Direction.EAST;
+                else if(current_r[number] == 2) d = Direction.SOUTH;
+                else d = Direction.WEST;
+                if(current_f[number] == 1) c = color1[number];
+                else c = color2[number];
+                if ((current_r[number] == 0) || (current_r[number] == 2)) {
+                    biasX = mouseX2 - getLayoutX() + 15;
+                    biasY = mouseY2 - getLayoutY() + 15;
+                    ltX = mouseX2 - biasX;
+                    ltY = mouseY2 - biasY;
+                    if ((ltX >= 20) && (ltX < 80)) {setLayoutX(50); col = 0;}
+                    else if ((ltX >= 80) && (ltX < 140)) {setLayoutX(110); col = 1;}
+                    else if ((ltX >= 140) && (ltX < 200)) {setLayoutX(170); col = 2;}
+                    else if ((ltX >= 200) && (ltX < 260)) {setLayoutX(230); col = 3;}
+                    else if ((ltX >= 260) && (ltX < 320)) {setLayoutX(290); col = 4;}
+                    else if ((ltX >= 320) && (ltX < 380)) {setLayoutX(350); col = 5;}
+                    else if ((ltX >= 380) && (ltX < 440)) {setLayoutX(410); col = 6;}
+                    else if ((ltX >= 440) && (ltX < 500)) {setLayoutX(470); col = 7;}
+                    else if ((ltX >= 500) && (ltX < 560)) {setLayoutX(530); col = 8;}
+                    else if ((ltX >= 560) && (ltX < 620)) {setLayoutX(590); col = 9;}
+                    else {
+                        if(on_board[number] == 1){
+                            PuzzlePieces p = new PuzzlePieces(d, c, row, col);
+                            GameBoard.removePiece(p, occupationArray);
+                        }
+                        on_board[number] = 0;
+                    }
+
+                    if ((ltY >= 0) && (ltY < 60)) {setLayoutY(30); row = 0;}
+                    else if ((ltY >= 60) && (ltY < 120)) {setLayoutY(90); row = 1;}
+                    else if ((ltY >= 120) && (ltY < 180)) {setLayoutY(150); row = 2;}
+                    else if ((ltY >= 180) && (ltY < 240)) {setLayoutY(210); row = 3;}
+                    else if ((ltY >= 240) && (ltY < 300)) {setLayoutY(270); row = 4;}
+                    else {
+                        if(on_board[number] == 1){
+                            PuzzlePieces p = new PuzzlePieces(d, c, row, col);
+                            GameBoard.removePiece(p, occupationArray);
+                        }
+                        on_board[number] = 0;
+                    }
+                }
+                else {
+                    if ((number >= 1) && (number <= 4)) {
+                        biasX = mouseX2 - getLayoutX() - 15;
+                        biasY = mouseY2 - getLayoutY() + 45;
+                        ltX = mouseX2 - biasX;
+                        ltY = mouseY2 - biasY;
+                        if ((ltX >= 0) && (ltX < 70)) {setLayoutX(20); col = 0;}
+                        else if ((ltX >= 70) && (ltX < 130)) {setLayoutX(80); col = 1;}
+                        else if ((ltX >= 130) && (ltX < 190)) {setLayoutX(140); col = 2;}
+                        else if ((ltX >= 190) && (ltX < 250)) {setLayoutX(200); col = 3;}
+                        else if ((ltX >= 250) && (ltX < 310)) {setLayoutX(260); col = 4;}
+                        else if ((ltX >= 310) && (ltX < 370)) {setLayoutX(320); col = 5;}
+                        else if ((ltX >= 370) && (ltX < 430)) {setLayoutX(380); col = 6;}
+                        else if ((ltX >= 430) && (ltX < 490)) {setLayoutX(440); col = 7;}
+                        else if ((ltX >= 490) && (ltX < 550)) {setLayoutX(500); col = 8;}
+                        else if ((ltX >= 550) && (ltX < 610)) {setLayoutX(560); col = 9;}
+                        else {
+                            if(on_board[number] == 1){
+                                PuzzlePieces p = new PuzzlePieces(d, c, row, col);
+                                GameBoard.removePiece(p, occupationArray);
+                            }
+                            on_board[number] = 0;
+                        }
+
+                        if ((ltY >= 0) && (ltY < 40)) {setLayoutY(60); row = 0;}
+                        else if ((ltY >= 40) && (ltY < 100)) {setLayoutY(120); row = 1;}
+                        else if ((ltY >= 100) && (ltY < 160)) {setLayoutY(180); row = 2;}
+                        else if ((ltY >= 160) && (ltY < 220)) {setLayoutY(240); row = 3;}
+                        else if ((ltY >= 220) && (ltY < 280)) {setLayoutY(300); row = 4;}
+                        else {
+                            if(on_board[number] == 1){
+                                PuzzlePieces p = new PuzzlePieces(d, c, row, col);
+                                GameBoard.removePiece(p, occupationArray);
+                            }
+                            on_board[number] = 0;
+                        }
+                    }
+                    else {
+                        biasX = mouseX2 - getLayoutX() + 15;
+                        biasY = mouseY2 - getLayoutY() + 15;
+                        ltX = mouseX2 - biasX;
+                        ltY = mouseY2 - biasY;
+                        if ((ltX >= -40) && (ltX < 20)) {setLayoutX(-10); col = 0;}
+                        else if ((ltX >= 20) && (ltX < 80)) {setLayoutX(50); col = 1;}
+                        else if ((ltX >= 80) && (ltX < 140)) {setLayoutX(110); col = 2;}
+                        else if ((ltX >= 140) && (ltX < 200)) {setLayoutX(170); col = 3;}
+                        else if ((ltX >= 200) && (ltX < 260)) {setLayoutX(230); col = 4;}
+                        else if ((ltX >= 260) && (ltX < 320)) {setLayoutX(290); col = 5;}
+                        else if ((ltX >= 320) && (ltX < 380)) {setLayoutX(350); col = 6;}
+                        else if ((ltX >= 380) && (ltX < 440)) {setLayoutX(410); col = 7;}
+                        else if ((ltX >= 440) && (ltX < 500)) {setLayoutX(470); col = 8;}
+                        else if ((ltX >= 500) && (ltX < 560)) {setLayoutX(530); col = 9;}
+                        else {
+                            if(on_board[number] == 1){
+                                PuzzlePieces p = new PuzzlePieces(d, c, row, col);
+                                GameBoard.removePiece(p, occupationArray);
+                            }
+                            on_board[number] = 0;
+                        }
+
+                        if ((ltY >= 0) && (ltY < 60)) {setLayoutY(30); row = 0;}
+                        else if ((ltY >= 60) && (ltY < 120)) {setLayoutY(90); row = 1;}
+                        else if ((ltY >= 120) && (ltY < 180)) {setLayoutY(150); row = 2;}
+                        else if ((ltY >= 180) && (ltY < 240)) {setLayoutY(210); row = 3;}
+                        else if ((ltY >= 240) && (ltY < 300)) {setLayoutY(270); row = 4;}
+                        else {
+                            if(on_board[number] == 1){
+                                PuzzlePieces p = new PuzzlePieces(d, c, row, col);
+                                GameBoard.removePiece(p, occupationArray);
+                            }
+                            on_board[number] = 0;
+                        }
+                    }
+                }
+                if(on_board[number] == 1) {
+                    PuzzlePieces p = new PuzzlePieces(d, c, row, col);
+                    if(!GameBoard.canBePut(p, occupationArray)) on_board[number] = 0;
+                }
+                if(on_board[number] == 0) {
+                    setLayoutX(150);
+                    setLayoutY(450);
+                }
+            }
+        }
         Button[] piece = new Button[10];
         for(int i = 0; i< 10; i++) {
             piece[i] = new Button(color[i]);
@@ -73,50 +282,52 @@ public class Board extends Application {
         flip.setLayoutX(600);
         flip.setLayoutY(520);
         root.getChildren().add(flip);
-        //number of piece showing on screen, show the first puzzle piece in beginning
-        final int[] current = {0};
-        /*the flip state of each piece
-        use picture in path1 when equals to 1,use piece in path2 when equals to 2*/
-        final int[] current_f = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-        final int[] current_r = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        Image origion = new Image(path1[current[0]]);//the screen shows the first puzzle piece at the beginning
-        ImageView pieceView = new ImageView();
-        pieceView.setImage(origion);
-        pieceView.setFitWidth(235);
-        pieceView.setFitHeight(110);
-        pieceView.setLayoutX(150);
-        pieceView.setLayoutY(450);
-        root.getChildren().add(pieceView);
+        DraggablePiece[] pieceView = new DraggablePiece[10];
+        for(int i = 0; i < 10; i++) {
+            pieceView[i] = new DraggablePiece(i);
+        }
+        Image origin = new Image(path1[current[0]]);//the screen shows the first puzzle piece at the beginning
+        pieceView[current[0]].setImage(origin);
+        pieceView[current[0]].setFitWidth(235);
+        pieceView[current[0]].setFitHeight(110);
+        pieceView[current[0]].setLayoutX(150);
+        pieceView[current[0]].setLayoutY(450);
+        root.getChildren().add(pieceView[current[0]]);
         for(int i = 0; i < 10; i++) {
             int num = i;    //number of the button
             piece[i].setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent e) {
+                    if(on_board[current[0]] == 0) {
+                        root.getChildren().remove(pieceView[current[0]]);
+                        //ImageView pieceView = new DraggablePiece();
+                    }
                     current[0] = num;   //change current piece
-                    root.getChildren().remove(pieceView);
                     //the flip state will be saved
                     //when coming back from another piece, the previous state won't change
                     if(current_f[num] == 1) {
                         Image image = new Image(path1[num]);
-                        pieceView.setImage(image);
+                        pieceView[current[0]].setImage(image);
                     }
                     else {
                         Image image = new Image(path2[num]);
-                        pieceView.setImage(image);
+                        pieceView[current[0]].setImage(image);
                     }
                     //different piece will be showed in different scale
                     if((num >= 1)&(num <= 4)) {
-                        pieceView.setFitWidth(175);
-                        pieceView.setFitHeight(110);
+                        pieceView[current[0]].setFitWidth(175);
+                        pieceView[current[0]].setFitHeight(110);
                     }
                     else {
-                        pieceView.setFitWidth(235);
-                        pieceView.setFitHeight(110);
+                        pieceView[current[0]].setFitWidth(235);
+                        pieceView[current[0]].setFitHeight(110);
                     }
-                    pieceView.setRotate(current_r[num] * 90);
-                    pieceView.setLayoutX(150);
-                    pieceView.setLayoutY(450);
-                    root.getChildren().add(pieceView);
+                    pieceView[current[0]].setRotate(current_r[num] * 90);
+                    if(on_board[num] == 0) {
+                        pieceView[current[0]].setLayoutX(150);
+                        pieceView[current[0]].setLayoutY(450);
+                        root.getChildren().add(pieceView[current[0]]);
+                    }
                 }
             });
         }
@@ -124,49 +335,50 @@ public class Board extends Application {
             @Override
             public void handle(ActionEvent e) {
                 int num = current[0];//find the piece showing on screen now
-                root.getChildren().remove(pieceView);
-                //flip the puzzle piece by using picture from another path
-                //change flip state
-                if(current_f[num] == 1) {
-                    Image image = new Image(path2[num]);
-                    current_f[num] = 2;
-                    pieceView.setImage(image);
+                if(on_board[num] == 0) { //when this piece is on the board, this button will be useless
+                    root.getChildren().remove(pieceView[current[0]]);
+                    //flip the puzzle piece by using picture from another path
+                    //change flip state
+                    if (current_f[num] == 1) {
+                        Image image = new Image(path2[num]);
+                        current_f[num] = 2;
+                        pieceView[current[0]].setImage(image);
+                    } else {
+                        Image image = new Image(path1[num]);
+                        current_f[num] = 1;
+                        pieceView[current[0]].setImage(image);
+                    }
+                    if ((num >= 1) & (num <= 4)) {
+                        pieceView[current[0]].setFitWidth(175);
+                        pieceView[current[0]].setFitHeight(110);
+                    } else {
+                        pieceView[current[0]].setFitWidth(235);
+                        pieceView[current[0]].setFitHeight(110);
+                    }
+                    pieceView[current[0]].setLayoutX(150);
+                    pieceView[current[0]].setLayoutY(450);
+                    root.getChildren().add(pieceView[current[0]]);
                 }
-                else {
-                    Image image = new Image(path1[num]);
-                    current_f[num] = 1;
-                    pieceView.setImage(image);
-                }
-                if((num >= 1)&(num <= 4)) {
-                    pieceView.setFitWidth(175);
-                    pieceView.setFitHeight(110);
-                }
-                else {
-                    pieceView.setFitWidth(235);
-                    pieceView.setFitHeight(110);
-                }
-                pieceView.setLayoutX(150);
-                pieceView.setLayoutY(450);
-                root.getChildren().add(pieceView);
             }
         });
         rotate.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 int num = current[0];//find the piece showing on screen now
-                root.getChildren().remove(pieceView);
-                //change rotate state
-                if(current_r[num] < 3) {
-                    current_r[num] += 1;
-                    pieceView.setRotate(current_r[num] * 90);
+                if(on_board[num] == 0) { //when this piece is on the board, this button will be useless
+                    root.getChildren().remove(pieceView[current[0]]);
+                    //change rotate state
+                    if (current_r[num] < 3) {
+                        current_r[num] += 1;
+                        pieceView[current[0]].setRotate(current_r[num] * 90);
+                    } else {
+                        current_r[num] = 0;
+                        pieceView[current[0]].setRotate(0);
+                    }
+                    pieceView[current[0]].setLayoutX(150);
+                    pieceView[current[0]].setLayoutY(450);
+                    root.getChildren().add(pieceView[current[0]]);
                 }
-                else {
-                    current_r[num] = 0;
-                    pieceView.setRotate(0);
-                }
-                pieceView.setLayoutX(150);
-                pieceView.setLayoutY(450);
-                root.getChildren().add(pieceView);
             }
         });
     }
