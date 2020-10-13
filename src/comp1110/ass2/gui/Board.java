@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.sql.SQLOutput;
+import java.util.Arrays;
 
 /**
  * @author Yuxuan Hu completed all codes in this file except implementChallenge function, which is authored by Boyang Gao
@@ -121,14 +122,14 @@ public class Board extends Application {
                 setOnMouseReleased(event -> {     // drag is complete
                     mouseX2 = event.getSceneX();
                     mouseY2 = event.getSceneY();
-                    on_board[current[0]] = 1;
+                    //on_board[current[0]] = 1;
                     adjust();
                     for(int i = 0; i < 10; i++) {
                         if((current[0] != number)&&(on_board[number] == 0)) root.getChildren().remove(this);
                     }
+                    System.out.println(Arrays.deepToString(occupationArray));
                 });
             }
-
             private void adjust() {
                 int x, y;
                 double biasX = 0;
@@ -152,6 +153,7 @@ public class Board extends Application {
                     biasY = mouseY2 - getLayoutY() + 15;
                     ltX = mouseX2 - biasX;
                     ltY = mouseY2 - biasY;
+                    if((ltX >= 20)&&(ltX <= 590)&&(ltY >= 0)&&(ltY <= 270)) on_board[number] = 1;
                     if ((ltX >= 20) && (ltX < 80)) {setLayoutX(50); col = 0;}
                     else if ((ltX >= 80) && (ltX < 140)) {setLayoutX(110); col = 1;}
                     else if ((ltX >= 140) && (ltX < 200)) {setLayoutX(170); col = 2;}
@@ -189,6 +191,7 @@ public class Board extends Application {
                         biasY = mouseY2 - getLayoutY() + 45;
                         ltX = mouseX2 - biasX;
                         ltY = mouseY2 - biasY;
+                        if((ltX >= 0)&&(ltX <= 610)&&(ltY >= 0)&&(ltY <= 280)) on_board[number] = 1;
                         if ((ltX >= 0) && (ltX < 70)) {setLayoutX(20); col = 0;}
                         else if ((ltX >= 70) && (ltX < 130)) {setLayoutX(80); col = 1;}
                         else if ((ltX >= 130) && (ltX < 190)) {setLayoutX(140); col = 2;}
@@ -225,6 +228,7 @@ public class Board extends Application {
                         biasY = mouseY2 - getLayoutY() + 15;
                         ltX = mouseX2 - biasX;
                         ltY = mouseY2 - biasY;
+                        if((ltX >= -40)&&(ltX <= 560)&&(ltY >= 20)&&(ltY <= 320)) on_board[number] = 1;
                         if ((ltX >= -40) && (ltX < 20)) {setLayoutX(-10); col = 0;}
                         else if ((ltX >= 20) && (ltX < 80)) {setLayoutX(50); col = 1;}
                         else if ((ltX >= 80) && (ltX < 140)) {setLayoutX(110); col = 2;}
@@ -243,11 +247,11 @@ public class Board extends Application {
                             on_board[number] = 0;
                         }
 
-                        if ((ltY >= 0) && (ltY < 60)) {setLayoutY(30); row = 0;}
-                        else if ((ltY >= 60) && (ltY < 120)) {setLayoutY(90); row = 1;}
-                        else if ((ltY >= 120) && (ltY < 180)) {setLayoutY(150); row = 2;}
-                        else if ((ltY >= 180) && (ltY < 240)) {setLayoutY(210); row = 3;}
-                        else if ((ltY >= 240) && (ltY < 300)) {setLayoutY(270); row = 4;}
+                        if ((ltY >= 20) && (ltY < 80)) {setLayoutY(90); row = 0;}
+                        else if ((ltY >= 80) && (ltY < 140)) {setLayoutY(150); row = 1;}
+                        else if ((ltY >= 140) && (ltY < 200)) {setLayoutY(210); row = 2;}
+                        else if ((ltY >= 200) && (ltY < 260)) {setLayoutY(270); row = 3;}
+                        else if ((ltY >= 260) && (ltY < 320)) {setLayoutY(330); row = 4;}
                         else {
                             if(on_board[number] == 1){
                                 PuzzlePieces p = new PuzzlePieces(d, c, row, col);
@@ -298,11 +302,14 @@ public class Board extends Application {
             piece[i].setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent e) {
-                    if(on_board[current[0]] == 0) {
+                    /*if(on_board[current[0]] == 0) {
                         root.getChildren().remove(pieceView[current[0]]);
                         //ImageView pieceView = new DraggablePiece();
-                    }
+                    }*/
                     current[0] = num;   //change current piece
+                    for(int i = 0; i < 10; i++) {
+                        if((on_board[i] == 0)&&(i != current[0])) root.getChildren().remove(pieceView[i]);
+                    }
                     //the flip state will be saved
                     //when coming back from another piece, the previous state won't change
                     if(current_f[num] == 1) {
