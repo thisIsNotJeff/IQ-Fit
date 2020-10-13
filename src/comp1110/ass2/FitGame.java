@@ -1172,36 +1172,84 @@ public class FitGame {
      */
 
     public static String getSolution(String challenge) {
-        var occupationArray = validityOccupation(challenge).getValue();
-        Set<Pair<Integer,Integer>> emptyLocation = new HashSet<>();
-        Set<Pair<Integer,Integer>> priorityLocation = new HashSet<>();
-//        for (int i = 1; i < 9; i++) {
-//            for (int j = 1; j < 4; j++) {
-//                if (occupationArray[i][j] == 0) emptyLocation.add(new Pair<>(i,j));
-//            }
-//        }
 
-        for (int i = 0; i < 10; i++) {
-            priorityLocation.add(new Pair<>(i,0));
-            priorityLocation.add(new Pair<>(i,4));
+        Set<Pair<Integer,Integer>> emptyLocation = occupationAsSet(validityOccupation(challenge).getValue());
+
+        if (emptyLocation.size()==0) return challenge;
+        else {
+            List<String> results = new ArrayList<>();
+
+            for (Pair<Integer,Integer> coordinates : emptyLocation) {
+                //if (getViablePiecePlacements(challenge, coordinates.getKey(), coordinates.getValue()).s)
+
+                // start searching
+                findSolution(challenge,coordinates,results);
+
+                // If found one solution, and it's not null(with length greater than 0) return it, and stop.
+                for (String result : results) {
+                    if (result.length() != 0) return result;
+                    break;
+                }
+
+            }
         }
 
-        for (int j = 0; j < 5 ; j++) {
-            priorityLocation.add(new Pair<>(0,j));
-            priorityLocation.add(new Pair<>(4,j));
-        }
-
-        for (Pair<Integer,Integer> p : priorityLocation) {
-
-        }
-
-
-
-
-
-
-        return null; // FIXME Task 9: determine the solution to the game, given a particular challenge
+        return null;
     }
+
+    public static void findSolution(String challenge, Pair<Integer,Integer> currentLocation, List<String> result) {
+        // base case: all the locations on the board are taken, solution found.
+        if (occupationAsSet(validityOccupation(challenge).getValue()).size() == 0)
+            result.add(challenge);
+        else {
+            Set<String> viablePieces = getViablePiecePlacements(challenge, currentLocation.getKey(), currentLocation.getValue());
+            if (viablePieces != null && viablePieces.size() != 0) {
+                for (String piece : viablePieces) {
+
+                    // added chosen piece into the string.
+                    challenge = sortStringPlacement(challenge + piece);
+
+                    // update the empty locations.
+                    Set<Pair<Integer,Integer>> emptyLocation = occupationAsSet(validityOccupation(challenge).getValue());
+
+                    if (emptyLocation.size() == 0) {
+                        result.add(challenge);
+                        break;
+                    }
+
+                    for (Pair<Integer,Integer> newLocation : emptyLocation) {
+                        findSolution(challenge,newLocation,result);
+                    }
+
+                    // remove the chosen piece.
+                    challenge = removePiece(challenge,piece);
+                }
+            }
+
+        }
+
+    }
+
+    public static Set<Pair<Integer,Integer>> occupationAsSet(int[][] occupationArray) {
+        Set<Pair<Integer,Integer>> rtn = new HashSet<>();
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (occupationArray[i][j] == 0) rtn.add(new Pair<>(i,j));
+            }
+        }
+        return rtn;
+    }
+
+    public static String removePiece(String challenge, String pieceToRemove) {
+        String rtn = "";
+        for (int i = 0; i < challenge.length(); i += 4) {
+            String piece = challenge.substring(i,i+4);
+            if (!piece.equals(pieceToRemove)) rtn += piece;
+        }
+        return rtn;
+    }
+
+
 
 
 }
