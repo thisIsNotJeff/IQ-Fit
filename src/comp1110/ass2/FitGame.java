@@ -1161,6 +1161,87 @@ public class FitGame {
     }
 
 
+    public static class gameTree {
+        String gameState;
+        Set<Pair<Integer, Integer>> emptyLocations;
+        List<gameTree> nodes;
+
+        public gameTree(String gameState, Set<Pair<Integer, Integer>> emptyLocations, List<gameTree> nodes) {
+            this.gameState = gameState;
+            this.emptyLocations = emptyLocations;
+            this.nodes = nodes;
+        }
+
+        @Override
+        public boolean equals(Object tree) {
+            if (this == tree) return true;
+            else if (!(tree instanceof gameTree)) return false;
+            else return (this.gameState.equals(((gameTree) tree).gameState));
+        }
+
+        public static void growTree(gameTree startRoot, int level) {
+            // check if the level satisfy the base case to stop.
+            if (level != 0) {
+
+                var validityOccupation = validityOccupation(startRoot.gameState);
+
+                var emptyLocations = occupationAsSet(validityOccupation.getValue());
+
+                // iterate over all the empty locations
+                for (Pair<Integer, Integer> location : emptyLocations) {
+                    Set<String> viablePieces = getViablePiecePlacements(startRoot.gameState, location.getKey(), location.getValue());
+
+                    // for each emptyLocation, iterate over each viable piece to cover that location.
+                    if (viablePieces != null && !viablePieces.isEmpty()) {
+
+                        // determine if any of them can be put in the game.
+                        for (String piece : viablePieces) {
+                            if (canPut(startRoot.gameState, piece)) {
+                                var newGameState = sortStringPlacement(startRoot.gameState + piece);
+                                var newEmptyLocations = occupationAsSet(validityOccupation(newGameState).getValue());
+                                List<gameTree> newGameTree = new ArrayList<>();
+
+                                gameTree nextNodes = new gameTree(newGameState, newEmptyLocations, newGameTree);
+
+                                boolean containsDuplicates = false;
+                                // do not adding gameTrees with the same gameState.
+                                for (gameTree tree : startRoot.nodes) {
+                                    if (nextNodes.equals(tree)) {
+                                        containsDuplicates = true;
+                                        break;
+                                    }
+                                }
+
+                                // add new node to the parent node.
+                                if (!containsDuplicates)
+                                    startRoot.nodes.add(nextNodes);
+
+                            }
+                        }
+                    } else break;
+
+                }
+
+                // continuing generating the children nodes of children nodes of the startNode.
+                for (gameTree childNode : startRoot.nodes) {
+                    growTree(childNode, level-1);
+//                // at this stage of the game, solution found, stop growing the tree.
+//                if (occupationAsSet(validityOccupation(childNode.gameState).getValue()).size() != 0)
+                }
+
+
+            }
+
+
+        }
+
+    }
+
+
+
+
+
+
 
 
     /**
@@ -1190,7 +1271,6 @@ public class FitGame {
                     if (result.length() != 0) return result;
                     break;
                 }
-
             }
         }
 
@@ -1207,7 +1287,10 @@ public class FitGame {
                 for (String piece : viablePieces) {
 
                     // added chosen piece into the string.
-                    challenge = sortStringPlacement(challenge + piece);
+                    if (canPut(challenge,piece))
+                        challenge = sortStringPlacement(challenge + piece);
+                    else continue;
+
 
                     // update the empty locations.
                     Set<Pair<Integer,Integer>> emptyLocation = occupationAsSet(validityOccupation(challenge).getValue());
@@ -1230,6 +1313,7 @@ public class FitGame {
 
     }
 
+
     public static Set<Pair<Integer,Integer>> occupationAsSet(int[][] occupationArray) {
         Set<Pair<Integer,Integer>> rtn = new HashSet<>();
         for (int i = 0; i < 10; i++) {
@@ -1247,6 +1331,118 @@ public class FitGame {
             if (!piece.equals(pieceToRemove)) rtn += piece;
         }
         return rtn;
+    }
+
+
+    public static boolean canPut(String challenge, String piece) {
+        List<String> colourAndDirList = new ArrayList<>();
+        for (int i = 0; i < challenge.length(); i+=4) {
+            colourAndDirList.add(challenge.charAt(i)+""+challenge.charAt(i+3));
+        }
+
+        String direction = piece.charAt(3)+"";
+        String color = piece.charAt(0) +"";
+
+        switch (color) {
+            case "b":
+                switch (direction) {
+                    case "N":
+                        return !colourAndDirList.contains("rN");
+                    case "E":
+                        return !colourAndDirList.contains("rE");
+                    case "S":
+                        return !colourAndDirList.contains("rS");
+                    case "W":
+                        return !colourAndDirList.contains("rW");
+                }
+                break;
+            case "r":
+                switch (direction) {
+                    case "N":
+                        return !colourAndDirList.contains("bN");
+                    case "E":
+                        return !colourAndDirList.contains("bE");
+                    case "S":
+                        return !colourAndDirList.contains("bS");
+                    case "W":
+                        return !colourAndDirList.contains("bW");
+                }
+                break;
+            case "o":
+                switch (direction) {
+                    case "N":
+                        return !colourAndDirList.contains("sN");
+                    case "E":
+                        return !colourAndDirList.contains("sE");
+                    case "S":
+                        return !colourAndDirList.contains("sS");
+                    case "W":
+                        return !colourAndDirList.contains("sW");
+                }
+                break;
+            case "s":
+                switch (direction) {
+                    case "N":
+                        return !colourAndDirList.contains("oN");
+                    case "E":
+                        return !colourAndDirList.contains("oE");
+                    case "S":
+                        return !colourAndDirList.contains("oS");
+                    case "W":
+                        return !colourAndDirList.contains("oW");
+                }
+                break;
+            case "L":
+                switch (direction) {
+                    case "N":
+                        return !colourAndDirList.contains("NN");
+                    case "E":
+                        return !colourAndDirList.contains("NE");
+                    case "S":
+                        return !colourAndDirList.contains("NS");
+                    case "W":
+                        return !colourAndDirList.contains("NW");
+                }
+                break;
+            case "N":
+                switch (direction) {
+                    case "N":
+                        return !colourAndDirList.contains("LN");
+                    case "E":
+                        return !colourAndDirList.contains("LE");
+                    case "S":
+                        return !colourAndDirList.contains("LS");
+                    case "W":
+                        return !colourAndDirList.contains("LW");
+                }
+                break;
+            case "g":
+                switch (direction) {
+                    case "N":
+                        return !colourAndDirList.contains("nN");
+                    case "E":
+                        return !colourAndDirList.contains("nE");
+                    case "S":
+                        return !colourAndDirList.contains("nS");
+                    case "W":
+                        return !colourAndDirList.contains("nW");
+                }
+                break;
+            case "n":
+                switch (direction) {
+                    case "N":
+                        return !colourAndDirList.contains("gN");
+                    case "E":
+                        return !colourAndDirList.contains("gE");
+                    case "S":
+                        return !colourAndDirList.contains("gS");
+                    case "W":
+                        return !colourAndDirList.contains("gW");
+                }
+                break;
+        }
+
+        return true;
     }
 
 
