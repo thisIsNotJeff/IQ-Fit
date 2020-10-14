@@ -27,7 +27,14 @@ public class Board extends Application {
     private static final int BOARD_WIDTH = 933;
     private static final int BOARD_HEIGHT = 700;
     private final Group root = new Group();
-
+    //number of piece showing on screen, show the first puzzle piece in beginning
+    final int[] current = {0};
+    /*the flip state of each piece
+    use picture in path1 when equals to 1,use piece in path2 when equals to 2*/
+    final int[] current_f = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    final int[] current_r = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    final int[] on_board = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //1 if the piece is on the board
+    //final int[] moveable = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
     // FIXME Task 7: Implement a basic playable Fix Game in JavaFX that only allows pieces to be placed in valid places
     void basic() {
         int[] picture = new int[10];
@@ -63,12 +70,12 @@ public class Board extends Application {
         imageView.setFitHeight(370);
         root.getChildren().add(imageView);
         //number of piece showing on screen, show the first puzzle piece in beginning
-        final int[] current = {0};
+        //final int[] current = {0};
         /*the flip state of each piece
         use picture in path1 when equals to 1,use piece in path2 when equals to 2*/
-        final int[] current_f = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+        /*final int[] current_f = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
         final int[] current_r = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        final int[] on_board = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //1 if the piece is on the board
+        final int[] on_board = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //1 if the piece is on the board*/
         int[][] occupationArray = new int[10][5];
         for(int i = 0; i< 10; i++) {
             for(int j = 0; j< 5; j++) {
@@ -129,8 +136,14 @@ public class Board extends Application {
                     }
                 });
             }
-            private void adjust() {
-                int x, y;
+            /*private void clear() {
+                if(allclear[0] == 0) {
+                    for(int i = 0; i < 10; i++) {
+                        root.getChildren().remove(piece);
+                    }
+                }
+            }*/
+            void adjust() {
                 double biasX = 0;
                 double biasY = 0;
                 double ltX;
@@ -289,6 +302,7 @@ public class Board extends Application {
         for(int i = 0; i < 10; i++) {
             pieceView[i] = new DraggablePiece(i);
         }
+        ImageView[] pview = new ImageView[10];
         Image origin = new Image(path1[current[0]]);//the screen shows the first puzzle piece at the beginning
         pieceView[current[0]].setImage(origin);
         pieceView[current[0]].setFitWidth(235);
@@ -387,6 +401,122 @@ public class Board extends Application {
                 }
             }
         });
+        TextField ChallengeTextField = new TextField();
+        ChallengeTextField.setPrefWidth(30);
+        ChallengeTextField.setPromptText("0 ~ 4");
+        ChallengeTextField.setPrefColumnCount(1);
+
+        Label ChallengeTextLabel = new Label("Difficulty Level:");
+        Button ChallengeButton = new Button("Challenge");
+
+        ChallengeButton.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent e) {
+                makeChallenge(Games.newGames(Integer.parseInt(ChallengeTextField.getText())).objective);
+                //System.out.println(Arrays.deepToString(occupationArray));
+                ChallengeTextField.clear();
+            }
+            private void makeChallenge(String placement) {
+                int num;//the number of piece
+                String f;//flip state
+                Color c;
+                Direction d;
+                int col, row;
+                //reset all previous pieces
+                for(int i = 0; i < 10; i++) {
+                    root.getChildren().remove(pieceView[i]);
+                    root.getChildren().remove(pview[i]);
+                    on_board[i] = 0;
+                    for(int j = 0; j < 5; j++) {
+                        occupationArray[i][j] = 0;
+                    }
+                }
+                for(int i = 0; i < placement.length(); i += 4) {
+                    if(placement.charAt(i) == 'b') {c = Color.blue; num = 0;}
+                    else if(placement.charAt(i) == 'B') {c = Color.BLUE; num = 0;}
+                    else if(placement.charAt(i) == 'g') {c = Color.green; num = 1;}
+                    else if(placement.charAt(i) == 'G') {c = Color.GREEN; num = 1;}
+                    else if(placement.charAt(i) == 'i') {c = Color.indigo; num = 2;}
+                    else if(placement.charAt(i) == 'I') {c = Color.INDIGO; num = 2;}
+                    else if(placement.charAt(i) == 'l') {c = Color.LIMEGREEN; num = 3;}
+                    else if(placement.charAt(i) == 'L') {c = Color.LIMEGREEN; num = 3;}
+                    else if(placement.charAt(i) == 'n') {c = Color.navyblue; num = 4;}
+                    else if(placement.charAt(i) == 'N') {c = Color.NAVYBLUE; num = 4;}
+                    else if(placement.charAt(i) == 'o') {c = Color.orange; num = 5;}
+                    else if(placement.charAt(i) == 'O') {c = Color.ORANGE; num = 5;}
+                    else if(placement.charAt(i) == 'p') {c = Color.pink; num = 6;}
+                    else if(placement.charAt(i) == 'P') {c = Color.PINK; num = 6;}
+                    else if(placement.charAt(i) == 'r') {c = Color.red; num = 7;}
+                    else if(placement.charAt(i) == 'R') {c = Color.RED; num = 7;}
+                    else if(placement.charAt(i) == 's') {c = Color.skyblue; num = 8;}
+                    else if(placement.charAt(i) == 'S') {c = Color.SKYBLUE; num = 8;}
+                    else if(placement.charAt(i) == 'y') {c = Color.yellow; num = 9;}
+                    else {c = Color.YELLOW; num = 9;}
+                    if(placement.charAt(i + 3) == 'N') d = Direction.NORTH;
+                    else if(placement.charAt(i + 3) == 'E') d = Direction.EAST;
+                    else if(placement.charAt(i + 3) == 'S') d = Direction.SOUTH;
+                    else d = Direction.WEST;
+                    col = placement.charAt(i + 1) - '0';
+                    row = placement.charAt(i + 2) - '0';
+                    PuzzlePieces p = new PuzzlePieces(d, c, row, col);
+                    GameBoard.canBePut(p, occupationArray);
+                    on_board[num] = 1;
+                    ////////////////////////////////
+                    int biasx = 0;
+                    int biasy = 0;
+                    char t = placement.charAt(i);
+                    char o = placement.charAt(i + 3);
+                    if((t == 'b')||(t == 'B')||(t == 'o')||(t == 'O')||(t == 'p')||
+                            (t == 'P')||(t == 'r')||(t == 'R')||(t == 's')||(t == 'S')||(t == 'y')||(t == 'Y')) {
+                        if(Character.isLowerCase(t)) f = "1";
+                        else f = "2";
+                        Image puzzle = new Image("file:src/comp1110/ass2/gui/assets/" + String.valueOf(t) + f + ".png");
+                        pview[num] = new ImageView();
+                        pview[num].setImage(puzzle);
+                        pview[num].setFitWidth(235);
+                        pview[num].setFitHeight(110);
+                        if((o == 'E')|(o == 'W')) {
+                            if(o == 'E')  pview[num].setRotate(90);
+                            else pview[num].setRotate(270);
+                            biasx = -60;
+                            biasy = 60;
+                        }
+                        if(o == 'S') pview[num].setRotate(180);
+                        pview[num].setLayoutX(50 + 60 * col + biasx);
+                        pview[num].setLayoutY(30 + 60 * row + biasy);
+                        root.getChildren().add(pview[num]);
+                    }
+                    else {
+                        if(Character.isLowerCase(t)) f = "1";
+                        else f = "2";
+                        Image puzzle = new Image("file:src/comp1110/ass2/gui/assets/" + String.valueOf(t) + f + ".png");
+                        pview[num] = new ImageView();
+                        pview[num].setImage(puzzle);
+                        pview[num].setFitWidth(175);
+                        pview[num].setFitHeight(110);
+                        if((o == 'E')|(o == 'W')) {
+                            if(o == 'E')  pview[num].setRotate(90);
+                            else pview[num].setRotate(270);
+                            biasx = -30;
+                            biasy = 30;
+                        }
+                        if(o == 'S') pview[num].setRotate(180);
+                        pview[num].setLayoutX(50 + 60*col + biasx);
+                        pview[num].setLayoutY(30 + 60*row + biasy);
+                        root.getChildren().add(pview[num]);
+                    }
+                    //////////////////////////////////
+                }
+            }
+        });
+
+        VBox vb = new VBox();
+        vb.getChildren().addAll(ChallengeTextLabel, ChallengeTextField, ChallengeButton);
+        vb.setSpacing(10);
+        vb.setLayoutX(690);
+        vb.setLayoutY(500);
+        root.getChildren().add(vb);
     }
 
 
@@ -402,7 +532,7 @@ public class Board extends Application {
         primaryStage.setTitle("Fit Game");
         Scene scene = new Scene(root, BOARD_WIDTH, BOARD_HEIGHT);
         basic();
-        implementChallenge();
+        //implementChallenge();
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -411,7 +541,7 @@ public class Board extends Application {
     // FIXME Task 8: Implement challenges (you may use assets provided for you in comp1110.ass2.gui.assets)
 
 
-    private void implementChallenge() {
+    /*private void implementChallenge() {
 
         TextField ChallengeTextField = new TextField();
         ChallengeTextField.setPrefWidth(30);
@@ -424,7 +554,7 @@ public class Board extends Application {
         ChallengeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                makePlacement(Games.newGames(Integer.parseInt(ChallengeTextField.getText())).objective);
+                makeChallenge(Games.newGames(Integer.parseInt(ChallengeTextField.getText())).objective);
                 ChallengeTextField.clear();
             }
         });
@@ -435,16 +565,9 @@ public class Board extends Application {
         vb.setLayoutX(690);
         vb.setLayoutY(500);
         root.getChildren().add(vb);
-    }
+    }*/
 
-    private void makePlacement(String placement) {
-
-        Image image = new Image("file:src/comp1110/ass2/gui/assets/board.png");
-        ImageView imageView = new ImageView();
-        imageView.setImage(image);
-        imageView.setFitWidth(700);
-        imageView.setFitHeight(370);
-        root.getChildren().add(imageView);
+    /*private void makeChallenge(String placement) {
         Image[] puzzle = new Image[placement.length() / 4];
         ImageView[] pview = new ImageView[placement.length() / 4];
         int n = 0;
@@ -496,8 +619,7 @@ public class Board extends Application {
                 root.getChildren().add(pview[n]);
             }
         }
-
-    }
+    }*/
 
 
 }

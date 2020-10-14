@@ -113,7 +113,6 @@ public class Viewer extends Application {
                 root.getChildren().add(pview[n]);
             }
         }
-
     }
 
     /**
