@@ -11,12 +11,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.sql.SQLOutput;
-import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * @author Yuxuan Hu completed all codes in this file except implementChallenge function, which is authored by Boyang Gao
@@ -34,6 +33,7 @@ public class Board extends Application {
     final int[] current_f = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
     final int[] current_r = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     final int[] on_board = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //1 if the piece is on the board
+    String challengeString = "";
     //final int[] moveable = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
     // FIXME Task 7: Implement a basic playable Fix Game in JavaFX that only allows pieces to be placed in valid places
     void basic() {
@@ -413,11 +413,14 @@ public class Board extends Application {
 
             @Override
             public void handle(ActionEvent e) {
+
                 makeChallenge(Games.newGames(Integer.parseInt(ChallengeTextField.getText())).objective);
+
                 //System.out.println(Arrays.deepToString(occupationArray));
                 ChallengeTextField.clear();
             }
-            private void makeChallenge(String placement) {
+            public void makeChallenge(String placement) {
+                challengeString = placement;
                 int num;//the number of piece
                 String f;//flip state
                 Color c;
@@ -425,6 +428,7 @@ public class Board extends Application {
                 int col, row;
                 //reset all previous pieces
                 for(int i = 0; i < 10; i++) {
+
                     root.getChildren().remove(pieceView[i]);
                     root.getChildren().remove(pview[i]);
                     on_board[i] = 0;
@@ -439,7 +443,7 @@ public class Board extends Application {
                     else if(placement.charAt(i) == 'G') {c = Color.GREEN; num = 1;}
                     else if(placement.charAt(i) == 'i') {c = Color.indigo; num = 2;}
                     else if(placement.charAt(i) == 'I') {c = Color.INDIGO; num = 2;}
-                    else if(placement.charAt(i) == 'l') {c = Color.LIMEGREEN; num = 3;}
+                    else if(placement.charAt(i) == 'l') {c = Color.limegreen; num = 3;}
                     else if(placement.charAt(i) == 'L') {c = Color.LIMEGREEN; num = 3;}
                     else if(placement.charAt(i) == 'n') {c = Color.navyblue; num = 4;}
                     else if(placement.charAt(i) == 'N') {c = Color.NAVYBLUE; num = 4;}
@@ -458,6 +462,7 @@ public class Board extends Application {
                     else if(placement.charAt(i + 3) == 'S') d = Direction.SOUTH;
                     else d = Direction.WEST;
                     col = placement.charAt(i + 1) - '0';
+
                     row = placement.charAt(i + 2) - '0';
                     PuzzlePieces p = new PuzzlePieces(d, c, row, col);
                     GameBoard.canBePut(p, occupationArray);
@@ -536,12 +541,6 @@ public class Board extends Application {
         });
     }
 
-
-
-
-
-    // FIXME Task 10: Implement hints (should become visible when the user presses '/' -- see gitlab issue for details)
-
     // FIXME Task 11: Generate interesting challenges (each challenge may have just one solution)
 
     @Override
@@ -549,6 +548,7 @@ public class Board extends Application {
         primaryStage.setTitle("Fit Game");
         Scene scene = new Scene(root, BOARD_WIDTH, BOARD_HEIGHT);
         basic();
+        setHints(scene);
         //implementChallenge();
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -556,6 +556,69 @@ public class Board extends Application {
 
 
     // FIXME Task 8: Implement challenges (you may use assets provided for you in comp1110.ass2.gui.assets)
+
+    // FIXME Task 10: Implement hints (should become visible when the user presses '/' -- see gitlab issue for details)
+
+
+   public void setHints(Scene scene){
+
+       scene.setOnKeyPressed(e -> {
+           if(e.getCode() == KeyCode.A){
+               /*for(int i = 0;i<on_board.length;i++){
+                   System.out.print(on_board[i] + "," );
+               }*/
+               /*System.out.println(on_board);*/
+               System.out.println(makeHints(challengeString));
+               e.consume();
+           }
+       });
+   }
+
+   public HashSet<String> makeHints(String placement) {
+        HashSet<String> solutionHashSet = Games.getSolutionSet(placement);
+        HashSet<String> challengeHashSet = new HashSet<String>();
+        Color color;
+        Direction direction;
+        int column;
+        int row;
+
+        for(int i = 0; i < placement.length(); i += 4) {
+            switch (placement.charAt(i)){
+                case 'b': color = Color.blue; break;
+                case 'B': color = Color.BLUE;break;
+                case 'g': color = Color.green;break;
+                case 'G': color = Color.GREEN;break;
+                case 'i': color = Color.indigo;break;
+                case 'I': color = Color.INDIGO;break;
+                case 'l': color = Color.limegreen;break;
+                case 'L': color = Color.LIMEGREEN;break;
+                case 'n': color = Color.navyblue;break;
+                case 'N': color = Color.NAVYBLUE;break;
+                case 'o': color = Color.orange;break;
+                case 'O': color = Color.ORANGE;break;
+                case 'p': color = Color.pink;break;
+                case 'P': color = Color.PINK;break;
+                case 'r': color = Color.red;break;
+                case 'R': color = Color.RED;break;
+                case 's': color = Color.skyblue;break;
+                case 'S': color = Color.SKYBLUE;break;
+                case 'y': color = Color.yellow;break;
+                default: color = Color.YELLOW;break;
+            }
+            switch (placement.charAt(i+3)){
+                case 'N': direction = Direction.NORTH; break;
+                case 'E': direction = Direction.EAST; break;
+                case 'S': direction = Direction.SOUTH; break;
+                default: direction = Direction.WEST; break;
+            }
+            column = placement.charAt(i + 1) - '0';
+            row = placement.charAt(i + 2) - '0';
+            challengeHashSet.add(new PuzzlePieces(direction, color, row, column).toString());
+        }
+        solutionHashSet.removeAll(challengeHashSet);
+        return solutionHashSet;
+    }
+
 
 
     /*private void implementChallenge() {
