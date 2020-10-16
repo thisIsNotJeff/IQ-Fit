@@ -510,13 +510,30 @@ public class Board extends Application {
                 }
             }
         });
-
         VBox vb = new VBox();
         vb.getChildren().addAll(ChallengeTextLabel, ChallengeTextField, ChallengeButton);
         vb.setSpacing(10);
         vb.setLayoutX(690);
         vb.setLayoutY(500);
         root.getChildren().add(vb);
+
+        Button Clear = new Button("Clear");
+        Clear.setLayoutX(690);
+        Clear.setLayoutY(595);
+        root.getChildren().add(Clear);
+        Clear.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                for(int i = 0; i < 10; i++) {
+                    root.getChildren().remove(pview[i]);
+                    root.getChildren().remove(pieceView[i]);
+                    on_board[i] = 0;
+                    for(int j = 0; j < 5; j++) {
+                        occupationArray[i][j] = 0;
+                    }
+                }
+            }
+        });
     }
 
 
