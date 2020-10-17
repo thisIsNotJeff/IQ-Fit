@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 /**
  * @author Yuxuan Hu completed task7, Boyang Gao wrote task8. Yuxuan Hu made some changes in Boyang's code
- * because there were conflict between task7 and task8.
+ * because there were conflict between task7 and task8
  */
 
 public class Board extends Application {
