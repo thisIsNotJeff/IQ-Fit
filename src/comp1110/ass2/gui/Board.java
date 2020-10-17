@@ -14,10 +14,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -553,12 +556,15 @@ public class Board extends Application {
         Scene scene = new Scene(root, BOARD_WIDTH, BOARD_HEIGHT);
         basic();
         setHints(scene);
+        backgroundMusic();
         //implementChallenge();
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     // FIXME Task 8: Implement challenges (you may use assets provided for you in comp1110.ass2.gui.assets)
+
+
 
     public void setHints(Scene scene){ // FIXME Task 10: Implement hints (should become visible when the user presses '/' -- see gitlab issue for details)
        scene.setOnKeyPressed(e -> {
@@ -575,11 +581,11 @@ public class Board extends Application {
                    t.setX(690);
                    t.setY(430);
                    Text t1 = new Text();
-                   t1.setText("To Enable Hints");
+                   t1.setText("To Enable Hint Function");
                    t1.setFont(Font.font ("Verdana", 12));
                    t1.setFill(javafx.scene.paint.Color.RED);
                    t1.setX(690);
-                   t1.setY(460);
+                   t1.setY(450);
                    hints.getChildren().add(t);
                    hints.getChildren().add(t1);
                    root.getChildren().add(hints);
@@ -717,6 +723,29 @@ public class Board extends Application {
         hints.getChildren().add(t1);
         hints.getChildren().add(hintImageView);
         root.getChildren().add(hints);
+    }
+
+    MediaPlayer musicPlayer;
+    public void backgroundMusic(){
+        String musicAddress = "src/comp1110/ass2/gui/assets/BGM.mp3";
+        Media musicMedia = new Media(Paths.get(musicAddress).toUri().toString());
+        musicPlayer = new MediaPlayer(musicMedia);
+        musicPlayer.play();
+        Button musicButton = new Button("Music");
+        musicButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+
+                if(musicPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)){
+                    musicPlayer.pause();
+                } else {
+                    musicPlayer.play();
+                }
+            }
+        });
+        musicButton.setLayoutX(885);
+        musicButton.setLayoutY(5);
+        root.getChildren().add(musicButton);
     }
 
     /*private void implementChallenge() {
