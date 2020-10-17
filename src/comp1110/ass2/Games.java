@@ -208,8 +208,8 @@ public class Games {
     return true;
   }
 
-  public static HashSet<String> getSolutionSet(String challenge) {
-    HashSet<String> solutionHashSet = new HashSet<>();
+  public static ArrayList<String> getSolutionArray(String challenge) {
+    ArrayList<String> solutionArray = new ArrayList<>();
     String solutionString = "";
 
     for(int i=0;i<Games.SOLUTIONS.length;i++){
@@ -220,12 +220,11 @@ public class Games {
 
     for(int i = 0; i < solutionString.length(); i+=4){
       if(i%4==0){
-        solutionHashSet.add(solutionString.substring(i,i+4));
+        solutionArray.add(solutionString.substring(i,i+4));
       }
     }
-    return solutionHashSet;
+    return solutionArray;
   }
-
 
   /**
    * @param game the Game object

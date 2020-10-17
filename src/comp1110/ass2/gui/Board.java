@@ -1,5 +1,6 @@
 package comp1110.ass2.gui;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import comp1110.ass2.*;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -13,9 +14,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * @author Yuxuan Hu completed all codes in this file except implementChallenge function, which is authored by Boyang Gao
@@ -26,6 +29,7 @@ public class Board extends Application {
     private static final int BOARD_WIDTH = 933;
     private static final int BOARD_HEIGHT = 700;
     private final Group root = new Group();
+    private static Group hints = new Group();
     //number of piece showing on screen, show the first puzzle piece in beginning
     final int[] current = {0};
     /*the flip state of each piece
@@ -420,7 +424,7 @@ public class Board extends Application {
                 ChallengeTextField.clear();
             }
             public void makeChallenge(String placement) {
-                challengeString = placement;
+                challengeString = placement; //store the placement string for Task 10
                 int num;//the number of piece
                 String f;//flip state
                 Color c;
@@ -554,29 +558,73 @@ public class Board extends Application {
         primaryStage.show();
     }
 
-
     // FIXME Task 8: Implement challenges (you may use assets provided for you in comp1110.ass2.gui.assets)
 
-    // FIXME Task 10: Implement hints (should become visible when the user presses '/' -- see gitlab issue for details)
-
-
-   public void setHints(Scene scene){
-
+    public void setHints(Scene scene){ // FIXME Task 10: Implement hints (should become visible when the user presses '/' -- see gitlab issue for details)
        scene.setOnKeyPressed(e -> {
-           if(e.getCode() == KeyCode.A){
-               /*for(int i = 0;i<on_board.length;i++){
-                   System.out.print(on_board[i] + "," );
-               }*/
-               /*System.out.println(on_board);*/
-               System.out.println(makeHints(challengeString));
+           if(e.getCode() == KeyCode.SLASH){
+               ArrayList l1 = new ArrayList();
+               for(int i =0;i<on_board.length;i++){
+                   l1.add(on_board[i]);
+               }
+               if(!l1.contains(1)){
+                   Text t = new Text();
+                   t.setText("Please Select A Challenge First");
+                   t.setFont(Font.font ("Verdana", 12));
+                   t.setFill(javafx.scene.paint.Color.RED);
+                   t.setX(690);
+                   t.setY(430);
+
+                   Text t1 = new Text();
+                   t1.setText("To Enable Hints");
+                   t1.setFont(Font.font ("Verdana", 12));
+                   t1.setFill(javafx.scene.paint.Color.RED);
+                   t1.setX(690);
+                   t1.setY(460);
+                   hints.getChildren().add(t);
+                   hints.getChildren().add(t1);
+                   root.getChildren().add(hints);
+               } else {
+                   ArrayList l2 = new ArrayList();
+                   for(int i = 0; i<on_board.length;i++){
+                       if(on_board[i]==0){
+                          if(i==0){l2.add('b');}
+                           if(i==1){l2.add('g');}
+                           if(i==2){l2.add('i');}
+                           if(i==3){l2.add('l');}
+                           if(i==4){l2.add('n');}
+                           if(i==5){l2.add('o');}
+                           if(i==6){l2.add('p');}
+                           if(i==7){l2.add('r');}
+                           if(i==8){l2.add('s');}
+                           if(i==9){l2.add('y');}
+                       }
+                   }
+                   char cr = (char)l2.get(0);
+                   ArrayList l3 = makeHints(challengeString);
+                   for(int i = l3.size()-1; i >=0;i--){
+                       char tmp = (char) Character.toLowerCase(l3.get(i).toString().charAt(0));
+                       if (tmp!=cr){
+                           l3.remove(i);
+                       }
+                   }
+                   hintImage((String)l3.get(0));
+               }
+               l1.clear();
                e.consume();
            }
        });
-   }
+        scene.setOnKeyReleased(e -> {
+            if(e.getCode() == KeyCode.SLASH){
+                hints.getChildren().clear();
+                root.getChildren().remove(hints);
+            }
+        });
+    }
 
-   public HashSet<String> makeHints(String placement) {
-        HashSet<String> solutionHashSet = Games.getSolutionSet(placement);
-        HashSet<String> challengeHashSet = new HashSet<String>();
+    public ArrayList<String> makeHints(String placement) {
+        ArrayList<String> solutionArray = Games.getSolutionArray(placement);
+        ArrayList<String> challengeArray = new ArrayList<String>();
         Color color;
         Direction direction;
         int column;
@@ -613,13 +661,64 @@ public class Board extends Application {
             }
             column = placement.charAt(i + 1) - '0';
             row = placement.charAt(i + 2) - '0';
-            challengeHashSet.add(new PuzzlePieces(direction, color, row, column).toString());
+            challengeArray.add(new PuzzlePieces(direction, color, row, column).toString());
         }
-        solutionHashSet.removeAll(challengeHashSet);
-        return solutionHashSet;
+        solutionArray.removeAll(challengeArray);
+        return solutionArray;
     }
 
+    public void hintImage(String imageString){
+        String state;
+        Character color = imageString.charAt(0);
+        Character direction = imageString.charAt(3);
 
+        if(Character.isLowerCase(color)){
+            state = "1";
+        } else {
+            state = "2";
+        }
+
+        ImageView hintImageView = new ImageView();
+        Image hintImage = new Image("file:src/comp1110/ass2/gui/assets/" + String.valueOf(color) + state + ".png");
+        hintImageView.setImage(hintImage);
+        if((color == 'b')||(color == 'B')||(color == 'o')||(color == 'O')||(color == 'p')||(color == 'P')||(color == 'r')||(color == 'R')||(color == 's')||(color == 'S')||(color == 'y')||(color == 'Y')) {
+            hintImageView.setFitWidth(235);
+            hintImageView.setFitHeight(110);
+
+            if((direction == 'E')|(direction == 'W')) {
+                if(direction == 'E')  {
+                    hintImageView.setRotate(90);
+                } else hintImageView.setRotate(270);
+            }
+            if(direction == 'S') {
+                hintImageView.setRotate(180);
+            }
+        } else {
+            hintImageView.setFitWidth(175);
+            hintImageView.setFitHeight(110);
+
+            if((direction == 'E')|(direction == 'W')) {
+                if(direction == 'E')  hintImageView.setRotate(90);
+                else hintImageView.setRotate(270);
+            }
+
+            if(direction == 'S') {
+                hintImageView.setRotate(180);
+            }
+        }
+
+        hintImageView.setLayoutX(700);
+        hintImageView.setLayoutY(150);
+        Text t1 = new Text();
+        t1.setText("The Coordination: (" + imageString.charAt(1) + ", "+ imageString.charAt(2) +")");
+        t1.setFont(Font.font ("Verdana", 12));
+        t1.setFill(javafx.scene.paint.Color.BLACK);
+        t1.setX(730);
+        t1.setY(350);
+        hints.getChildren().add(t1);
+        hints.getChildren().add(hintImageView);
+        root.getChildren().add(hints);
+    }
 
     /*private void implementChallenge() {
 
