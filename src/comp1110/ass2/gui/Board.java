@@ -574,7 +574,6 @@ public class Board extends Application {
                    t.setFill(javafx.scene.paint.Color.RED);
                    t.setX(690);
                    t.setY(430);
-
                    Text t1 = new Text();
                    t1.setText("To Enable Hints");
                    t1.setFont(Font.font ("Verdana", 12));
