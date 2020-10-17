@@ -1,5 +1,7 @@
 package comp1110.ass2;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+
 import java.util.*;
 
 /**
@@ -169,6 +171,7 @@ public class Games {
    * @return An Game at the appropriate level of difficulty.
    * @Anuthor Boyang Gao
    */
+
   public static Games newGames(int difficulty) {
     if (difficulty == 0){
       return SOLUTIONS[(int)(Math.random()*24)];
@@ -203,6 +206,24 @@ public class Games {
     if(this.placement == other.placement){
     } else return false;
     return true;
+  }
+
+  public static ArrayList<String> getSolutionArray(String challenge) {
+    ArrayList<String> solutionArray = new ArrayList<>();
+    String solutionString = "";
+
+    for(int i=0;i<Games.SOLUTIONS.length;i++){
+      if(challenge==Games.SOLUTIONS[i].objective){
+        solutionString = Games.SOLUTIONS[i].placement;
+      }
+    }
+
+    for(int i = 0; i < solutionString.length(); i+=4){
+      if(i%4==0){
+        solutionArray.add(solutionString.substring(i,i+4));
+      }
+    }
+    return solutionArray;
   }
 
   /**
