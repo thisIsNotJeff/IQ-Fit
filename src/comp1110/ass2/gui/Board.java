@@ -747,6 +747,14 @@ public class Board extends Application {
         musicButton.setLayoutX(885);
         musicButton.setLayoutY(5);
         root.getChildren().add(musicButton);
+
+        Text t1 = new Text();
+        t1.setText("Hint(Press / while CAPS lock ON )");
+        t1.setFont(Font.font ("Verdana", 12));
+        t1.setFill(javafx.scene.paint.Color.BLACK);
+        t1.setX(690);
+        t1.setY(487);
+        root.getChildren().add(t1);
     }
 
     /*private void implementChallenge() {
