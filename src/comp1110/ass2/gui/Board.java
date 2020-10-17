@@ -16,6 +16,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -565,8 +566,6 @@ public class Board extends Application {
 
     // FIXME Task 8: Implement challenges (you may use assets provided for you in comp1110.ass2.gui.assets)
 
-
-
     public void setHints(Scene scene){ // FIXME Task 10: Implement hints (should become visible when the user presses '/' -- see gitlab issue for details)
        scene.setOnKeyPressed(e -> {
            if(e.getCode() == KeyCode.SLASH){
@@ -714,13 +713,45 @@ public class Board extends Application {
         }
 
         hintImageView.setLayoutX(700);
-        hintImageView.setLayoutY(150);
+        hintImageView.setLayoutY(70);
+
+        ImageView arrow = new ImageView();
+        Image arrowImage = new Image("file:src/comp1110/ass2/gui/assets/Arrow.png");
+        arrow.setImage(arrowImage);
+        arrow.setFitHeight(32);
+        arrow.setFitWidth(20.2);
+        int arrowPosition;
+        switch (imageString.charAt(0)){
+            case 'b': arrowPosition=0; break;
+            case 'B': arrowPosition=0; break;
+            case 'g': arrowPosition=1;break;
+            case 'G': arrowPosition=1;break;
+            case 'i': arrowPosition=2;break;
+            case 'I': arrowPosition=2;break;
+            case 'l': arrowPosition=3;break;
+            case 'L': arrowPosition=3;break;
+            case 'n': arrowPosition=4;break;
+            case 'N': arrowPosition=4;break;
+            case 'o':arrowPosition=5;break;
+            case 'O': arrowPosition=5;break;
+            case 'p': arrowPosition=6;break;
+            case 'P': arrowPosition=6;break;
+            case 'r': arrowPosition=7;break;
+            case 'R': arrowPosition=7;break;
+            case 's': arrowPosition=8;break;
+            case 'S': arrowPosition=8;break;
+            default: arrowPosition=9;break;
+        }
+        arrow.setX(60 + 80 * arrowPosition);
+        arrow.setY(660);
+
         Text t1 = new Text();
-        t1.setText("The Coordination: (" + imageString.charAt(1) + ", "+ imageString.charAt(2) +")");
+        t1.setText("Row - " + imageString.charAt(1) + ", Column - "+ imageString.charAt(2));
         t1.setFont(Font.font ("Verdana", 12));
         t1.setFill(javafx.scene.paint.Color.BLACK);
-        t1.setX(730);
-        t1.setY(350);
+        t1.setX(750);
+        t1.setY(260);
+        hints.getChildren().add(arrow);
         hints.getChildren().add(t1);
         hints.getChildren().add(hintImageView);
         root.getChildren().add(hints);
