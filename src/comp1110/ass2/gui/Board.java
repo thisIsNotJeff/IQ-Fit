@@ -1,6 +1,5 @@
 package comp1110.ass2.gui;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import comp1110.ass2.*;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -16,10 +15,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.nio.file.Paths;
 import java.util.*;
@@ -589,6 +588,22 @@ public class Board extends Application {
                    hints.getChildren().add(t);
                    hints.getChildren().add(t1);
                    root.getChildren().add(hints);
+               } else if(!l1.contains(0)){
+                   Text t = new Text();
+                   t.setText("CONGRATULATION !");
+                   t.setFont(Font.font ("Verdana", 12));
+                   t.setFill(javafx.scene.paint.Color.RED);
+                   t.setX(690);
+                   t.setY(430);
+                   Text t1 = new Text();
+                   t1.setText("You have completed the game !");
+                   t1.setFont(Font.font ("Verdana", 12));
+                   t1.setFill(javafx.scene.paint.Color.RED);
+                   t1.setX(690);
+                   t1.setY(450);
+                   hints.getChildren().add(t);
+                   hints.getChildren().add(t1);
+                   root.getChildren().add(hints);
                } else {
                    ArrayList l2 = new ArrayList();
                    for(int i = 0; i<on_board.length;i++){
@@ -614,6 +629,7 @@ public class Board extends Application {
                        }
                    }
                    hintImage((String)l3.get(0));
+                   boardCoordinate();
                }
                l1.clear();
                e.consume();
@@ -682,7 +698,6 @@ public class Board extends Application {
         } else {
             state = "2";
         }
-
         ImageView hintImageView = new ImageView();
         Image hintImage = new Image("file:src/comp1110/ass2/gui/assets/" + String.valueOf(color) + state + ".png");
         hintImageView.setImage(hintImage);
@@ -706,7 +721,6 @@ public class Board extends Application {
                 if(direction == 'E')  hintImageView.setRotate(90);
                 else hintImageView.setRotate(270);
             }
-
             if(direction == 'S') {
                 hintImageView.setRotate(180);
             }
@@ -715,15 +729,14 @@ public class Board extends Application {
         hintImageView.setLayoutX(700);
         hintImageView.setLayoutY(70);
 
-        ImageView arrow = new ImageView();
         Image arrowImage = new Image("file:src/comp1110/ass2/gui/assets/Arrow.png");
-        arrow.setImage(arrowImage);
-        arrow.setFitHeight(32);
-        arrow.setFitWidth(20.2);
+        ImageView arrowImageView = new ImageView(arrowImage);
+        arrowImageView.setFitHeight(32);
+        arrowImageView.setPreserveRatio(true);
         int arrowPosition;
         switch (imageString.charAt(0)){
-            case 'b': arrowPosition=0; break;
-            case 'B': arrowPosition=0; break;
+            case 'b': arrowPosition=0;break;
+            case 'B': arrowPosition=0;break;
             case 'g': arrowPosition=1;break;
             case 'G': arrowPosition=1;break;
             case 'i': arrowPosition=2;break;
@@ -742,42 +755,75 @@ public class Board extends Application {
             case 'S': arrowPosition=8;break;
             default: arrowPosition=9;break;
         }
-        arrow.setX(60 + 80 * arrowPosition);
-        arrow.setY(660);
+        arrowImageView.setX(60 + 80 * arrowPosition);
+        arrowImageView.setY(660);
+
+        if(Character.isUpperCase(imageString.charAt(0))){
+            ImageView arrowImageView2 = new ImageView(arrowImage);
+            arrowImageView2.setFitHeight(30);
+            arrowImageView2.setPreserveRatio(true);
+            arrowImageView2.setX(608);
+            arrowImageView2.setY(547);
+            hints.getChildren().add(arrowImageView2);
+        }
 
         Text t1 = new Text();
-        t1.setText("Row - " + imageString.charAt(1) + ", Column - "+ imageString.charAt(2));
+        t1.setText("Column - " + imageString.charAt(1) + ", Row - "+ imageString.charAt(2));
         t1.setFont(Font.font ("Verdana", 12));
         t1.setFill(javafx.scene.paint.Color.BLACK);
         t1.setX(750);
         t1.setY(260);
-        hints.getChildren().add(arrow);
+        hints.getChildren().add(arrowImageView);
         hints.getChildren().add(t1);
         hints.getChildren().add(hintImageView);
         root.getChildren().add(hints);
     }
 
-    MediaPlayer musicPlayer;
     public void backgroundMusic(){
+        MediaPlayer musicPlayer;
         String musicAddress = "src/comp1110/ass2/gui/assets/BGM.mp3";
         Media musicMedia = new Media(Paths.get(musicAddress).toUri().toString());
         musicPlayer = new MediaPlayer(musicMedia);
+        musicPlayer.getOnRepeat();
+        musicPlayer.setOnEndOfMedia(new Runnable() {
+            @Override
+            public void run() {
+                musicPlayer.seek(Duration.ZERO);
+                musicPlayer.play();
+            }
+        });
         musicPlayer.play();
-        Button musicButton = new Button("Music");
-        musicButton.setOnAction(new EventHandler<ActionEvent>() {
+
+        Image playButtonImage = new Image("file:src/comp1110/ass2/gui/assets/playButton.png");
+        ImageView playButtonImageView = new ImageView(playButtonImage);
+        playButtonImageView.setFitWidth(10);
+        playButtonImageView.setPreserveRatio(true);
+
+        Image pauseButtonImage = new Image("file:src/comp1110/ass2/gui/assets/pauseButton.png");
+        ImageView pauseButtonImageView = new ImageView(pauseButtonImage);
+        pauseButtonImageView.setFitWidth(10);
+        pauseButtonImageView.setPreserveRatio(true);
+
+        Button musicControlButton = new Button();
+        musicControlButton.setGraphic(pauseButtonImageView);
+        musicControlButton.setLayoutX(900);
+        musicControlButton.setLayoutY(5);
+        musicControlButton.setPrefSize(13,13);
+        root.getChildren().add(musicControlButton);
+
+        musicControlButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
 
                 if(musicPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)){
                     musicPlayer.pause();
+                    musicControlButton.setGraphic(playButtonImageView);
                 } else {
                     musicPlayer.play();
+                    musicControlButton.setGraphic(pauseButtonImageView);
                 }
             }
         });
-        musicButton.setLayoutX(885);
-        musicButton.setLayoutY(5);
-        root.getChildren().add(musicButton);
 
         Text t1 = new Text();
         t1.setText("Hint(Press / while CAPS lock ON )");
@@ -788,85 +834,35 @@ public class Board extends Application {
         root.getChildren().add(t1);
     }
 
-    /*private void implementChallenge() {
+    public void boardCoordinate(){
+        Text column = new Text("Column");
+        column.setFill(javafx.scene.paint.Color.WHITE);
+        /*column.setFont(Font.font("Verdana", FontWeight.BOLD, 11));*/
+        column.setX(8);
+        column.setY(340);
 
-        TextField ChallengeTextField = new TextField();
-        ChallengeTextField.setPrefWidth(30);
-        ChallengeTextField.setPromptText("0 ~ 4");
-        ChallengeTextField.setPrefColumnCount(1);
+        Text row = new Text("Row");
+        row.setFill(javafx.scene.paint.Color.WHITE);
+        row.setX(648);
+        row.setY(25);
+        hints.getChildren().add(column);
+        hints.getChildren().add(row);
 
-        Label ChallengeTextLabel = new Label("Difficulty Level:");
-        Button ChallengeButton = new Button("Challenge");
-
-        ChallengeButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                makeChallenge(Games.newGames(Integer.parseInt(ChallengeTextField.getText())).objective);
-                ChallengeTextField.clear();
-            }
-        });
-
-        VBox vb = new VBox();
-        vb.getChildren().addAll(ChallengeTextLabel, ChallengeTextField, ChallengeButton);
-        vb.setSpacing(10);
-        vb.setLayoutX(690);
-        vb.setLayoutY(500);
-        root.getChildren().add(vb);
-    }*/
-
-    /*private void makeChallenge(String placement) {
-        Image[] puzzle = new Image[placement.length() / 4];
-        ImageView[] pview = new ImageView[placement.length() / 4];
-        int n = 0;
-        String num;
-        for(int i = 0; i < placement.length(); i += 4) {
-            int biasx = 0;
-            int biasy = 0;
-            char t = placement.charAt(i);
-            int c = placement.charAt(i + 1) - '0';
-            int r = placement.charAt(i + 2) - '0';
-            char o = placement.charAt(i + 3);
-            if((t == 'b')||(t == 'B')||(t == 'o')||(t == 'O')||(t == 'p')||
-                    (t == 'P')||(t == 'r')||(t == 'R')||(t == 's')||(t == 'S')||(t == 'y')||(t == 'Y')) {
-                if(Character.isLowerCase(t)) num = "1";
-                else num = "2";
-                puzzle[n] = new Image("file:src/comp1110/ass2/gui/assets/" + String.valueOf(t) + num + ".png");
-                pview[n] = new ImageView();
-                pview[n].setImage(puzzle[n]);
-                pview[n].setFitWidth(235);
-                pview[n].setFitHeight(110);
-                if((o == 'E')|(o == 'W')) {
-                    if(o == 'E')  pview[n].setRotate(90);
-                    else pview[n].setRotate(270);
-                    biasx = -60;
-                    biasy = 60;
-                }
-                if(o == 'S') pview[n].setRotate(180);
-                pview[n].setLayoutX(50 + 60*c + biasx);
-                pview[n].setLayoutY(30 + 60*r + biasy);
-                root.getChildren().add(pview[n]);
-            }
-            else {
-                if(Character.isLowerCase(t)) num = "1";
-                else num = "2";
-                puzzle[n] = new Image("file:src/comp1110/ass2/gui/assets/" + String.valueOf(t) + num + ".png");
-                pview[n] = new ImageView();
-                pview[n].setImage(puzzle[n]);
-                pview[n].setFitWidth(175);
-                pview[n].setFitHeight(110);
-                if((o == 'E')|(o == 'W')) {
-                    if(o == 'E')  pview[n].setRotate(90);
-                    else pview[n].setRotate(270);
-                    biasx = -30;
-                    biasy = 30;
-                }
-                if(o == 'S') pview[n].setRotate(180);
-                pview[n].setLayoutX(50 + 60*c + biasx);
-                pview[n].setLayoutY(30 + 60*r + biasy);
-                root.getChildren().add(pview[n]);
-            }
+        for(int i =0;i<10;i++){
+            Text columnCoordinate = new Text(i + "");
+            columnCoordinate.setFill(javafx.scene.paint.Color.WHITE);
+            columnCoordinate.setX(75+i*60);
+            columnCoordinate.setY(340);
+            hints.getChildren().add(columnCoordinate);
         }
-    }*/
 
+        for(int i =0;i<5;i++){
+            Text rowCoordinate = new Text(i + "");
+            rowCoordinate.setFill(javafx.scene.paint.Color.WHITE);
+            rowCoordinate.setX(655);
+            rowCoordinate.setY(60 + i*60);
+            hints.getChildren().add(rowCoordinate);
+        }
+    }
 
 }
