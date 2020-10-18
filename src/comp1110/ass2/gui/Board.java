@@ -42,7 +42,6 @@ public class Board extends Application {
     final int[] current_r = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     final int[] on_board = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //1 if the piece is on the board
     String challengeString = "";
-    //final int[] moveable = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
     // FIXME Task 7: Implement a basic playable Fix Game in JavaFX that only allows pieces to be placed in valid places
     void basic() {
         int[] picture = new int[10];
@@ -69,21 +68,14 @@ public class Board extends Application {
         path2[7] = "file:src/comp1110/ass2/gui/assets/R2.png";
         path2[8] = "file:src/comp1110/ass2/gui/assets/S2.png";
         path2[9] = "file:src/comp1110/ass2/gui/assets/Y2.png";
-        String[] color = {"blue", "green", "indigo", "limegreen", "navyblue", "orange",
-                          "pink", "red", "skyblue", "yellow"};
+        String[] color = {"  blue   ", "  green  ", "  indigo ", "limegreen", " navyblue", "  orange ",
+                          "   pink  ", "   red   ", " skyblue ", "  yellow "};
         Image image = new Image("file:src/comp1110/ass2/gui/assets/board.png");
         ImageView imageView = new ImageView();
         imageView.setImage(image);
         imageView.setFitWidth(700);
         imageView.setFitHeight(370);
         root.getChildren().add(imageView);
-        //number of piece showing on screen, show the first puzzle piece in beginning
-        //final int[] current = {0};
-        /*the flip state of each piece
-        use picture in path1 when equals to 1,use piece in path2 when equals to 2*/
-        /*final int[] current_f = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-        final int[] current_r = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        final int[] on_board = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //1 if the piece is on the board*/
         int[][] occupationArray = new int[10][5];
         for(int i = 0; i< 10; i++) {
             for(int j = 0; j< 5; j++) {
@@ -101,7 +93,6 @@ public class Board extends Application {
 
             DraggablePiece(int number) {
                 this.number = number;
-                /* event handlers */
                 setOnMousePressed(event -> {      // mouse press indicates begin of drag
                     mouseX1 = event.getSceneX();
                     mouseY1 = event.getSceneY();
@@ -144,13 +135,6 @@ public class Board extends Application {
                     }
                 });
             }
-            /*private void clear() {
-                if(allclear[0] == 0) {
-                    for(int i = 0; i < 10; i++) {
-                        root.getChildren().remove(piece);
-                    }
-                }
-            }*/
             void adjust() {
                 double biasX = 0;
                 double biasY = 0;
@@ -323,10 +307,6 @@ public class Board extends Application {
             piece[i].setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent e) {
-                    /*if(on_board[current[0]] == 0) {
-                        root.getChildren().remove(pieceView[current[0]]);
-                        //ImageView pieceView = new DraggablePiece();
-                    }*/
                     current[0] = num;   //change current piece
                     for(int i = 0; i < 10; i++) {
                         if((on_board[i] == 0)&&(i != current[0])) root.getChildren().remove(pieceView[i]);
@@ -475,7 +455,6 @@ public class Board extends Application {
                     PuzzlePieces p = new PuzzlePieces(d, c, row, col);
                     GameBoard.canBePut(p, occupationArray);
                     on_board[num] = 1;
-                    ////////////////////////////////
                     int biasx = 0;
                     int biasy = 0;
                     char t = placement.charAt(i);
@@ -519,7 +498,6 @@ public class Board extends Application {
                         pview[num].setLayoutY(30 + 60*row + biasy);
                         root.getChildren().add(pview[num]);
                     }
-                    //////////////////////////////////
                 }
             }
         });
@@ -558,7 +536,6 @@ public class Board extends Application {
         basic();
         setHints(scene);
         backgroundMusic();
-        //implementChallenge();
         primaryStage.setScene(scene);
         primaryStage.show();
     }
