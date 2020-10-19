@@ -759,7 +759,7 @@ public class Board extends Application {
 
     public void backgroundMusic(){
         MediaPlayer musicPlayer;
-        String musicAddress = "src/comp1110/ass2/gui/assets/BGM.wav";
+        String musicAddress = "src/comp1110/ass2/gui/assets/bgm.mp3";
         Media musicMedia = new Media(Paths.get(musicAddress).toUri().toString());
         musicPlayer = new MediaPlayer(musicMedia);
         musicPlayer.getOnRepeat();
