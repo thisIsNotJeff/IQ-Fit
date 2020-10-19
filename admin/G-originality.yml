@@ -22,16 +22,16 @@ declaration: >-
 # Add as many "url+licence+comment" entries as necessary
 # (or remove it altogether if you haven't used any external assets)
 assets:
-  - comment:
-    url:
-    licence:
+  - comment: I used the music, "Royalty Free Music" from Bensound as background music for our game.
+    url: https://www.bensound.com/royalty-free-music/track/ukulele
+    licence: Free Liencese
 
 
 # Sign *your* name and uids here. (Remove entries if you have fewer
 # than three members.)
 signatures:
-  - name:
-    uid:
+  - name: Boyang Gao
+    uid: u7175363
   - name:
     uid:
   - name: Yuxuan Hu

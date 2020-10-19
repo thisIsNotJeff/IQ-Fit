@@ -11,3 +11,5 @@ of our project implements the following features:
  - Implements interesting starting challenges (Task 11)
 
 additional features...
+
+- Added Background music
