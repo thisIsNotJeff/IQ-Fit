@@ -23,14 +23,14 @@
     <orderEntry type="module-library" exported="">
       <library name="JavaFX">
         <CLASSES>
-          <root url="file://C:/Program Files/Java/jdk-13.0.2.8-hotspot/lib" />
+          <root url="file://$PATH_TO_FX$" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://C:/Program Files/Java/jdk-13.0.2.8-hotspot/lib" />
+          <root url="file://$PATH_TO_FX$" />
         </SOURCES>
-        <jarDirectory url="file://C:/Program Files/Java/jdk-13.0.2.8-hotspot/lib" recursive="false" />
-        <jarDirectory url="file://C:/Program Files/Java/jdk-13.0.2.8-hotspot/lib" recursive="false" type="SOURCES" />
+        <jarDirectory url="file://$PATH_TO_FX$" recursive="false" />
+        <jarDirectory url="file://$PATH_TO_FX$" recursive="false" type="SOURCES" />
       </library>
     </orderEntry>
   </component>

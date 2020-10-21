@@ -4,6 +4,7 @@ import comp1110.ass2.*;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -24,7 +25,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 /**
- * @author Yuxuan Hu completed task7, Boyang Gao wrote task8. Yuxuan Hu made some changes in Boyang's code
+ * @author Yuxuan Hu completed task7, Boyang Gao wrote task8 and task10. Yuxuan Hu made some changes to Boyang's code in task8
  * because there were conflict between task7 and task8
  */
 
@@ -758,7 +759,7 @@ public class Board extends Application {
 
     public void backgroundMusic(){
         MediaPlayer musicPlayer;
-        String musicAddress = "src/comp1110/ass2/gui/assets/BGM.mp3";
+        String musicAddress = "src/comp1110/ass2/gui/assets/bgm.mp3";
         Media musicMedia = new Media(Paths.get(musicAddress).toUri().toString());
         musicPlayer = new MediaPlayer(musicMedia);
         musicPlayer.getOnRepeat();
