@@ -94,7 +94,7 @@ public class Board extends Application {
 
             DraggablePiece(int number) {
                 this.number = number;
-                setOnMousePressed(event -> {      // mouse press indicates begin of drag
+                setOnMousePressed(event -> {
                     mouseX1 = event.getSceneX();
                     mouseY1 = event.getSceneY();
                     mouseX0 = mouseX1;
@@ -116,20 +116,17 @@ public class Board extends Application {
                         GameBoard.removePiece(p, occupationArray);
                     }
                 });
-                setOnMouseDragged(event -> {      // mouse is being dragged
-                    //  can be legally moved.
+                setOnMouseDragged(event -> {
                     movementX = event.getSceneX() - mouseX1;
                     movementY = event.getSceneY() - mouseY1;
                     setLayoutX(getLayoutX() + movementX);
                     setLayoutY(getLayoutY() + movementY);
                     mouseX1 = event.getSceneX();
                     mouseY1 = event.getSceneY();
-                    //event.consume();
                 });
-                setOnMouseReleased(event -> {     // drag is complete
+                setOnMouseReleased(event -> {
                     mouseX2 = event.getSceneX();
                     mouseY2 = event.getSceneY();
-                    //on_board[current[0]] = 1;
                     adjust();
                     for(int i = 0; i < 10; i++) {
                         if((current[0] != number)&&(on_board[number] == 0)) root.getChildren().remove(this);
@@ -528,8 +525,6 @@ public class Board extends Application {
         });
     }
 
-    // FIXME Task 11: Generate interesting challenges (each challenge may have just one solution)
-
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Fit Game");
@@ -540,8 +535,6 @@ public class Board extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
-    // FIXME Task 8: Implement challenges (you may use assets provided for you in comp1110.ass2.gui.assets)
 
     public void setHints(Scene scene){ // FIXME Task 10: Implement hints (should become visible when the user presses '/' -- see gitlab issue for details)
        scene.setOnKeyPressed(e -> {
@@ -842,5 +835,7 @@ public class Board extends Application {
             hints.getChildren().add(rowCoordinate);
         }
     }
+
+    // FIXME Task 11: Generate interesting challenges (each challenge may have just one solution)
 
 }
