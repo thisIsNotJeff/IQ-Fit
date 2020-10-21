@@ -539,7 +539,9 @@ public class Board extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-    
+
+    // FIXME Task 8: Implement challenges (you may use assets provided for you in comp1110.ass2.gui.assets)
+
     public void setHints(Scene scene){ // FIXME Task 10: Implement hints (should become visible when the user presses '/' -- see gitlab issue for details)
        scene.setOnKeyPressed(e -> {
            if(e.getCode() == KeyCode.SLASH){
