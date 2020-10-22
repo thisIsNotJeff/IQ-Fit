@@ -541,6 +541,9 @@ public class Board extends Application {
         primaryStage.show();
     }
 
+    /**
+     * Set up the hint messages (to appear when the '/' key is pressed)
+     */
     public void setHints(Scene scene){ // FIXME Task 10: Implement hints (should become visible when the user presses '/' -- see gitlab issue for details)
        scene.setOnKeyPressed(e -> {
            if(e.getCode() == KeyCode.SLASH){
@@ -548,7 +551,7 @@ public class Board extends Application {
                for(int i =0;i<on_board.length;i++){
                    l1.add(on_board[i]);
                }
-               if(!l1.contains(1)){
+               if(!l1.contains(1)){ //if the board if empty, dont show the hint and remind player
                    Text t = new Text();
                    t.setText("Please Select A Challenge First");
                    t.setFont(Font.font ("Verdana", 12));
@@ -564,7 +567,7 @@ public class Board extends Application {
                    hints.getChildren().add(t);
                    hints.getChildren().add(t1);
                    root.getChildren().add(hints);
-               } else if(!l1.contains(0)){
+               } else if(!l1.contains(0)){ //if the board if full, dont show the hint and remind player
                    Text t = new Text();
                    t.setText("CONGRATULATION !");
                    t.setFont(Font.font ("Verdana", 12));
@@ -619,6 +622,11 @@ public class Board extends Application {
         });
     }
 
+    /**
+     * Given starting placement string of a challenge, return the all puzzle pieces required to complete the challenge
+     * @param placement the starting placement string of challenge
+     * @return a arrayList contains all puzzle pieces required to complete the game
+     */
     public ArrayList<String> makeHints(String placement) {
         ArrayList<String> solutionArray = Games.getSolutionArray(placement);
         ArrayList<String> challengeArray = new ArrayList<String>();
@@ -664,6 +672,11 @@ public class Board extends Application {
         return solutionArray;
     }
 
+    /**
+     * Given a placement string of single puzzle piece , show the corresponding image
+     * @param imageString placement string of single puzzle piece
+     * @return the image of puzzle piece appears right to the game board
+     */
     public void hintImage(String imageString){
         String state;
         Character color = imageString.charAt(0);
@@ -731,7 +744,7 @@ public class Board extends Application {
             case 'S': arrowPosition=8;break;
             default: arrowPosition=9;break;
         }
-        arrowImageView.setX(60 + 80 * arrowPosition);
+        arrowImageView.setX(60 + 80 * arrowPosition); // arrow appears in different location according to the puzzle piece color of hint
         arrowImageView.setY(660);
 
         if(Character.isUpperCase(imageString.charAt(0))){
@@ -755,13 +768,16 @@ public class Board extends Application {
         root.getChildren().add(hints);
     }
 
+    /**
+     * create the button that enables the background music
+     */
     public void backgroundMusic(){
         MediaPlayer musicPlayer;
         String musicAddress = "src/comp1110/ass2/gui/assets/bgm.mp3";
         Media musicMedia = new Media(Paths.get(musicAddress).toUri().toString());
         musicPlayer = new MediaPlayer(musicMedia);
         musicPlayer.getOnRepeat();
-        musicPlayer.setOnEndOfMedia(new Runnable() {
+        musicPlayer.setOnEndOfMedia(new Runnable() { //create a loop for the music
             @Override
             public void run() {
                 musicPlayer.seek(Duration.ZERO);
@@ -794,7 +810,7 @@ public class Board extends Application {
                 if(musicPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)){
                     musicPlayer.pause();
                     musicControlButton.setGraphic(playButtonImageView);
-                } else {
+                } else { //if the music is currently paused, play the music
                     musicPlayer.play();
                     musicControlButton.setGraphic(pauseButtonImageView);
                 }
@@ -810,10 +826,12 @@ public class Board extends Application {
         root.getChildren().add(t1);
     }
 
+    /**
+     * Show the the coordinates of the game board
+     */
     public void boardCoordinate(){
         Text column = new Text("Column");
         column.setFill(javafx.scene.paint.Color.WHITE);
-        /*column.setFont(Font.font("Verdana", FontWeight.BOLD, 11));*/
         column.setX(8);
         column.setY(340);
 
