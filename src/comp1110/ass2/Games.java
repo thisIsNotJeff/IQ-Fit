@@ -1,7 +1,5 @@
 package comp1110.ass2;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
-
 import java.util.*;
 
 /**
