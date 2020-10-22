@@ -724,24 +724,33 @@ public class Board extends Application {
         arrowImageView.setPreserveRatio(true);
         int arrowPosition;
         switch (imageString.charAt(0)){
-            case 'b': arrowPosition=0;break;
-            case 'B': arrowPosition=0;break;
-            case 'g': arrowPosition=1;break;
-            case 'G': arrowPosition=1;break;
-            case 'i': arrowPosition=2;break;
-            case 'I': arrowPosition=2;break;
-            case 'l': arrowPosition=3;break;
-            case 'L': arrowPosition=3;break;
-            case 'n': arrowPosition=4;break;
-            case 'N': arrowPosition=4;break;
-            case 'o':arrowPosition=5;break;
-            case 'O': arrowPosition=5;break;
-            case 'p': arrowPosition=6;break;
-            case 'P': arrowPosition=6;break;
-            case 'r': arrowPosition=7;break;
-            case 'R': arrowPosition=7;break;
-            case 's': arrowPosition=8;break;
-            case 'S': arrowPosition=8;break;
+            case 'b':
+            case 'B':
+                arrowPosition=0;break;
+            case 'g':
+            case 'G':
+                arrowPosition=1;break;
+            case 'i':
+            case 'I':
+                arrowPosition=2;break;
+            case 'l':
+            case 'L':
+                arrowPosition=3;break;
+            case 'n':
+            case 'N':
+                arrowPosition=4;break;
+            case 'o':
+            case 'O':
+                arrowPosition=5;break;
+            case 'p':
+            case 'P':
+                arrowPosition=6;break;
+            case 'r':
+            case 'R':
+                arrowPosition=7;break;
+            case 's':
+            case 'S':
+                arrowPosition=8;break;
             default: arrowPosition=9;break;
         }
         arrowImageView.setX(60 + 80 * arrowPosition); // arrow appears in different location according to the puzzle piece color of hint

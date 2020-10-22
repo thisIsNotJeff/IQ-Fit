@@ -1354,7 +1354,7 @@ public class FitGame {
 
 
     /**
-     * SortByAverage will sort the Combinations according to how the different size of pieces are distributed,
+     * SortByDistribution will sort the Combinations according to how the different size of pieces are distributed,
      * the more balanced one will be in the former places.
      *
      * Author: Qinrui Cheng  u7133046.
