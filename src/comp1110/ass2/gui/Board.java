@@ -40,7 +40,7 @@ public class Board extends Application {
     /*the flip state of each piece
     use picture in path1 when equals to 1,use piece in path2 when equals to 2*/
     final int[] current_f = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-    final int[] current_r = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    final int[] current_r = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //rotate state of each piece
     final int[] on_board = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //1 if the piece is on the board
     String challengeString = "";
     // FIXME Task 7: Implement a basic playable Fix Game in JavaFX that only allows pieces to be placed in valid places
@@ -91,7 +91,6 @@ public class Board extends Application {
             int number; //number of this piece
             int col;
             int row;
-
             DraggablePiece(int number) {
                 this.number = number;
                 setOnMousePressed(event -> {
@@ -136,8 +135,8 @@ public class Board extends Application {
             void adjust() {
                 double biasX = 0;
                 double biasY = 0;
-                double ltX;
-                double ltY;
+                double ltX; //left top position of x
+                double ltY; //left top position of y
                 Color[] color1 = {Color.blue, Color.green, Color.indigo, Color.limegreen, Color.navyblue,
                         Color.orange, Color.pink, Color.red, Color.skyblue, Color.yellow};
                 Color[] color2 = {Color.BLUE, Color.GREEN, Color.INDIGO, Color.LIMEGREEN, Color.NAVYBLUE,
@@ -150,11 +149,13 @@ public class Board extends Application {
                 else d = Direction.WEST;
                 if(current_f[number] == 1) c = color1[number];
                 else c = color2[number];
+                // when current_r is equal to 0 or 2, the top left position is the same
                 if ((current_r[number] == 0) || (current_r[number] == 2)) {
                     biasX = mouseX2 - getLayoutX() + 15;
                     biasY = mouseY2 - getLayoutY() + 15;
                     ltX = mouseX2 - biasX;
                     ltY = mouseY2 - biasY;
+                    //set on_board to 1 only when both x and y are valid
                     if((ltX >= 20)&&(ltX <= 590)&&(ltY >= 0)&&(ltY <= 270)) on_board[number] = 1;
                     if ((ltX >= 20) && (ltX < 80)) {setLayoutX(50); col = 0;}
                     else if ((ltX >= 80) && (ltX < 140)) {setLayoutX(110); col = 1;}
@@ -167,6 +168,7 @@ public class Board extends Application {
                     else if ((ltX >= 500) && (ltX < 560)) {setLayoutX(530); col = 8;}
                     else if ((ltX >= 560) && (ltX < 620)) {setLayoutX(590); col = 9;}
                     else {
+                        //if the piece is already on the board before it is put on a invalid place, remove it from the board
                         if(on_board[number] == 1){
                             PuzzlePieces p = new PuzzlePieces(d, c, row, col);
                             GameBoard.removePiece(p, occupationArray);
@@ -188,6 +190,7 @@ public class Board extends Application {
                     }
                 }
                 else {
+                    // pieces with different shape have to be handled differently
                     if ((number >= 1) && (number <= 4)) {
                         biasX = mouseX2 - getLayoutX() - 15;
                         biasY = mouseY2 - getLayoutY() + 45;
@@ -263,10 +266,12 @@ public class Board extends Application {
                         }
                     }
                 }
+                //if the piece is put on a valid place, get the position it accupies and add it to occupation array
                 if(on_board[number] == 1) {
                     PuzzlePieces p = new PuzzlePieces(d, c, row, col);
                     if(!GameBoard.canBePut(p, occupationArray)) on_board[number] = 0;
                 }
+                //if it's a invalid place, but the piece bake to the bottom
                 if(on_board[number] == 0) {
                     setLayoutX(150);
                     setLayoutY(450);

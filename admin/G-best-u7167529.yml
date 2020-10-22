@@ -32,6 +32,11 @@ declaration: >-
 class:
   -DraggablePiece
 
-# sign *your* name and uid here
+# I wish to submit the following methods as entirely my own (remove this if
+# you want to just submit classes):
+method:
+  -adjust()
+
+  # sign *your* name and uid here
 name: Yuxuan Hu
 uid: u7167529
