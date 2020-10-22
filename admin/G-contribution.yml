@@ -12,8 +12,8 @@ declaration: >-
 contributions:
   - uid: u7175363
     contribution: 33
-  - uid:
-    contribution:
+  - uid: u7133046
+    contribution: 33 
   - uid: u7167529
     contribution: 33
 
@@ -22,7 +22,7 @@ contributions:
 signatures:
   - name: Boyang Gao
     uid: u7175363
-  - name:
-    uid:
+  - name: Qinrui Cheng
+    uid: u7133046
   - name: Yuxuan Hu
     uid: u7167529
