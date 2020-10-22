@@ -17,7 +17,7 @@ declaration: >-
 # you want to just submit classes):
 method:
    - hintImage() in Board class
-   - 
+   - setHints() in Board class
 
 # sign *your* name and uid here
 name: Boyang Gao
