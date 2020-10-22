@@ -1161,159 +1161,337 @@ public class FitGame {
     }
 
 
-    public static class gameTree {
-        String gameState;
-        Set<Pair<Integer, Integer>> emptyLocations;
-        List<gameTree> nodes;
 
-        public gameTree(String gameState, Set<Pair<Integer, Integer>> emptyLocations, List<gameTree> nodes) {
+    /**
+     * A class used to found the solution of a challenge,
+     *
+     * Author: Qinrui Cheng  u7133046.
+     */
+    public static class gameState {
+        String gameState;
+        String currentSolution;
+
+        public gameState(String gameState, String currentSolution) {
             this.gameState = gameState;
-            this.emptyLocations = emptyLocations;
-            this.nodes = nodes;
+            this.currentSolution = currentSolution;
         }
 
         @Override
-        public boolean equals(Object tree) {
-            if (this == tree) return true;
-            else if (!(tree instanceof gameTree)) return false;
-            else return (this.gameState.equals(((gameTree) tree).gameState));
-        }
-
-        public static void growTree(gameTree startRoot, int level) {
-            // check if the level satisfy the base case to stop.
-            if (level != 0) {
-
-                var validityOccupation = validityOccupation(startRoot.gameState);
-
-                var emptyLocations = occupationAsSet(validityOccupation.getValue());
-
-                // iterate over all the empty locations
-                for (Pair<Integer, Integer> location : emptyLocations) {
-                    Set<String> viablePieces = getViablePiecePlacements(startRoot.gameState, location.getKey(), location.getValue());
-
-                    // for each emptyLocation, iterate over each viable piece to cover that location.
-                    if (viablePieces != null && !viablePieces.isEmpty()) {
-
-                        // determine if any of them can be put in the game.
-                        for (String piece : viablePieces) {
-                            if (canPut(startRoot.gameState, piece)) {
-                                var newGameState = sortStringPlacement(startRoot.gameState + piece);
-                                var newEmptyLocations = occupationAsSet(validityOccupation(newGameState).getValue());
-                                List<gameTree> newGameTree = new ArrayList<>();
-
-                                gameTree nextNodes = new gameTree(newGameState, newEmptyLocations, newGameTree);
-
-                                boolean containsDuplicates = false;
-                                // do not adding gameTrees with the same gameState.
-                                for (gameTree tree : startRoot.nodes) {
-                                    if (nextNodes.equals(tree)) {
-                                        containsDuplicates = true;
-                                        break;
-                                    }
-                                }
-
-                                // add new node to the parent node.
-                                if (!containsDuplicates)
-                                    startRoot.nodes.add(nextNodes);
-
-                            }
-                        }
-                    } else break;
-
-                }
-
-                // continuing generating the children nodes of children nodes of the startNode.
-                for (gameTree childNode : startRoot.nodes) {
-                    growTree(childNode, level-1);
-//                // at this stage of the game, solution found, stop growing the tree.
-//                if (occupationAsSet(validityOccupation(childNode.gameState).getValue()).size() != 0)
-                }
-
-
-            }
-
-
+        public String toString() {
+            return "Tree "+this.gameState + " CurrentSolution "+this.currentSolution;
         }
 
     }
 
 
 
+    /**
+     * Given a gameState, a List indicating the pieces used so far, a HashMap of String and a List of String to store the invalid gameStates and the piece chosen for that state,
+     * a List for storing the result and a possible combination to search, findSolution will call itself recursively until the solution is found.
+     *
+     * @param startRoot a starting root for search.
+     * @param pieceTrack a List to store the chosen pieces.
+     * @param invalidStates a HashMap to store the invalid States and pieces.
+     * @param result a List to store the result.
+     * @param combination a possible combination to search.
+     *
+     * Author: Qinrui Cheng  u7133046.
+     */
+    public static void findSolution(gameState startRoot, List<String> pieceTrack, HashMap<String, ArrayList<String>> invalidStates, List<String> result, Combinations combination) {
+        var validityOccupation = validityOccupation(startRoot.gameState);
+        var emptyLocations = occupationAsSet(validityOccupation.getValue());
 
+
+        // check if the level satisfy the base case to stop.
+        if (emptyLocations.size() == 0) {
+            result.add(startRoot.gameState);
+        } else  {
+            for (Pair<Integer, Integer> emptyLocation : emptyLocations) {
+                if (!result.isEmpty()) break;
+                var viablePieces = getViablePiecePlacements(startRoot.gameState, emptyLocation.getKey(), emptyLocation.getValue());
+                if (viablePieces != null && !viablePieces.isEmpty()) {
+                    for (String piece : viablePieces) {
+                        if (!result.isEmpty()) break;
+
+                        // only put pieces satisfies these conditions
+                        if ((!invalidStates.containsKey(piece) || !invalidStates.get(piece).contains(startRoot.gameState)) && canPut(piece) && correctCombination(combination, startRoot.currentSolution) && canPut(startRoot.currentSolution,piece)) {
+
+                            var newGameState = sortStringPlacement(startRoot.gameState + piece);
+
+                            pieceTrack.add(piece);
+
+                            startRoot.gameState = newGameState;
+
+                            findSolution(startRoot, pieceTrack, invalidStates, result, combination);
+
+                        }
+
+
+                    }
+
+
+
+                }
+
+                // if found any point can't be cover by a pieces than the whole gameState is not valid, so break.
+                break;
+
+            }
+
+            // remove the last piece that cause the game to be invalid.
+            var latestPiece = pieceTrack.remove(pieceTrack.size() - 1);
+
+            var originalState = removePiece(startRoot.gameState, latestPiece);
+
+
+            // update the invalidState
+            if (invalidStates.containsKey(latestPiece)) {
+                var listToBeUpdate = invalidStates.get(latestPiece);
+                listToBeUpdate.add(originalState);
+                invalidStates.compute(latestPiece, (k, v) -> v = listToBeUpdate);
+            } else {
+                ArrayList<String> newList = new ArrayList<>();
+                newList.add(originalState);
+                invalidStates.put(latestPiece, newList);
+            }
+
+            startRoot.gameState = originalState;
+
+        }
+
+
+    }
+
+
+
+    /**
+     * Given a Combination, and a String challenge, return if the current String challenge satisfies the
+     * condition of the Combination.
+     *
+     * @param combinations A combination representing the possible pieces would solve the game.
+     * @param challenge A string challenge.
+     * @return if the conditions are satisfied.
+     * Author: Qinrui Cheng  u7133046.
+     */
+
+    public static boolean correctCombination(Combinations combinations, String challenge) {
+        ArrayList<String> pieceAsList = new ArrayList<>();
+        int small = combinations.small;
+        int medium = combinations.medium;
+        int large = combinations.large;
+
+        for (int i = 0; i < challenge.length(); i+=4) {
+            char color = challenge.charAt(i);
+
+            switch (color) {
+                case 'g':
+                case 'i':
+                case 'l':
+                case 'n':
+                    if (small > 0)
+                        small = small-1;
+                    else return false;
+
+                case 'B':
+                case 'O':
+                case 'P':
+                case 'R':
+                case 'S':
+                case 'Y':
+                    if (large > 0)
+                        large = large-1;
+                    else return false;
+
+                default:
+                    if (medium > 0)
+                        medium = medium-1;
+                    else return false;
+            }
+        }
+
+        return small>=0 && medium >=0 && large >= 0;
+    }
 
 
 
 
     /**
+     * Combinations represent the possible pieces to found the solution.
+     *
+     * Author: Qinrui Cheng  u7133046.
+     */
+
+    public static class Combinations {
+
+        int small;
+        int medium;
+        int large;
+
+
+
+        /**
+         * @param small small are the pieces that cover 4 coordinates.
+         * @param medium medium are the pieces that cover 5 coordinates.
+         * @param large large are the pieces that cover 6 coordinates.
+         */
+        public Combinations(int small, int medium, int large) {
+            this.small = small;
+            this.medium = medium;
+            this.large = large;
+        }
+
+        @Override
+        public String toString() {
+            return "small "+this.small+" medium "+this.medium+" large "+this.large;
+        }
+
+    }
+
+
+    /**
+     * SortByAverage will sort the Combinations according to how the different size of pieces are distributed,
+     * the more balanced one will be in the former places.
+     *
+     * Author: Qinrui Cheng  u7133046.
+     */
+    public static class SortByAverage implements Comparator<Combinations> {
+
+        @Override
+        public int compare(Combinations o1, Combinations o2) {
+
+            int a = Math.max(Math.max(o1.small, o1.medium),o1.large);
+            int b = Math.min(Math.min(o1.small, o1.medium),o1.large);
+
+
+            int c = Math.max(Math.max(o2.small, o2.medium),o2.large);
+            int d = Math.min(Math.min(o2.small, o2.medium),o2.large);
+
+
+            return (a-b) - (c-d);
+        }
+    }
+
+
+
+    /**
+     * pieceCombination will found all the combinations that might solve a challenge by giving it
+     * the number of empty coordinates in the board.
+     * @param emptyLocations the number of empty locations on the board.
+     *
+     * @return a List of Combinations.
+     *
+     * Author: Qinrui Cheng  u7133046.
+     */
+
+    public static ArrayList<Combinations> pieceCombinations(int emptyLocations) {
+        ArrayList<Combinations> combinations = new ArrayList<>();
+
+        // found how many small pieces need.
+        for (int i = 0; i*4 <= emptyLocations && i <= 4; i++) {
+            // found how many medium pieces need.
+            for (int j = 0; j*5 <= emptyLocations && j <= 10; j++) {
+                // found how many large pieces need.
+                for (int k = 0; k*6 <= emptyLocations && k <= 6; k++) {
+                    if (i*4 + j*5 + k*6 == emptyLocations)
+                        combinations.add(new Combinations(i,j,k));
+                }
+            }
+        }
+
+        return combinations;
+    }
+
+
+
+    /**
+     * Given a String representing a piece, canPut will determine if the piece can be put on the board.
+     * This method will test pieces on the trivial situations.
+     *
+     * @param piece piece to be tested.
+     *
+     * @return if this piece can be put on the board.
+     *
+     * Author: Qinrui Cheng  u7133046.
+     */
+    public static boolean canPut(String piece) {
+        char color = piece.charAt(0);
+        char col = piece.charAt(1);
+        char row = piece.charAt(2);
+        char dir = piece.charAt(3);
+
+        switch (color) {
+            case 'b':
+            case 'B':
+            case 'L':
+            case 'N':
+            case 'O':
+            case 'r':
+            case 'R':
+            case 'y':
+                if (row == 0 && dir == 'S') return false;
+                else if (row == 3 && dir == 'N') return false;
+                else if (col == 0 && dir == 'E') return false;
+                else if (col == 8 && dir == 'W') return false;
+
+            default:
+                return true;
+
+        }
+
+    }
+
+    /**
      * Return the solution to a particular challenge.
-     **
+     * *
+     *
      * @param challenge A challenge string.
      * @return A placement string describing the encoding of the solution to
      * the challenge.
+     *
+     * Author: Qinrui Cheng  u7133046.
      */
 
     public static String getSolution(String challenge) {
+        gameState test = new gameState(challenge,"");
 
-        Set<Pair<Integer,Integer>> emptyLocation = occupationAsSet(validityOccupation(challenge).getValue());
+        List<String> result = new ArrayList<>();
 
-        if (emptyLocation.size()==0) return challenge;
-        else {
-            List<String> results = new ArrayList<>();
+        HashMap<String,ArrayList<String>> invalidStates = new HashMap<>();
+        List<String> pieceTrack = new ArrayList<>();
 
-            for (Pair<Integer,Integer> coordinates : emptyLocation) {
-                //if (getViablePiecePlacements(challenge, coordinates.getKey(), coordinates.getValue()).s)
-
-                // start searching
-                findSolution(challenge,coordinates,results);
-
-                // If found one solution, and it's not null(with length greater than 0) return it, and stop.
-                for (String result : results) {
-                    if (result.length() != 0) return result;
-                    break;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public static void findSolution(String challenge, Pair<Integer,Integer> currentLocation, List<String> result) {
-        // base case: all the locations on the board are taken, solution found.
-        if (occupationAsSet(validityOccupation(challenge).getValue()).size() == 0)
-            result.add(challenge);
-        else {
-            Set<String> viablePieces = getViablePiecePlacements(challenge, currentLocation.getKey(), currentLocation.getValue());
-            if (viablePieces != null && viablePieces.size() != 0) {
-                for (String piece : viablePieces) {
-
-                    // added chosen piece into the string.
-                    if (canPut(challenge,piece))
-                        challenge = sortStringPlacement(challenge + piece);
-                    else continue;
+        var combinations = pieceCombinations(occupationAsSet(validityOccupation(challenge).getValue()).size());
 
 
-                    // update the empty locations.
-                    Set<Pair<Integer,Integer>> emptyLocation = occupationAsSet(validityOccupation(challenge).getValue());
+        // sort the Combinations to improve the possibility of finding the solution.
+        combinations.sort(new SortByAverage());
 
-                    if (emptyLocation.size() == 0) {
-                        result.add(challenge);
-                        break;
-                    }
+        int numberOfPieceToPut = 10 - challenge.length()/4;
 
-                    for (Pair<Integer,Integer> newLocation : emptyLocation) {
-                        findSolution(challenge,newLocation,result);
-                    }
+        for (Combinations combination : combinations) {
+            // test if the total number of pieces are not the same as the pieces need to solve the game.
+            if (combination.small+combination.medium+ combination.large != numberOfPieceToPut)
+                continue;
+            findSolution(test,pieceTrack,invalidStates,result,combination);
 
-                    // remove the chosen piece.
-                    challenge = removePiece(challenge,piece);
-                }
-            }
+            if (!result.isEmpty())
+                break;
 
         }
 
+        return result.get(0);
     }
 
 
+
+    /**
+     * occupationAsSet will convert a int Array of empty locations to a set of
+     * Pair of empty locations, with key indicating the column, value indicating the row.
+     *
+     * @param occupationArray an Array of Array representing the board occupations.
+     *
+     * @return a Set of Pairs representing the coordinates.
+     * Author: Qinrui Cheng  u7133046.
+     */
     public static Set<Pair<Integer,Integer>> occupationAsSet(int[][] occupationArray) {
         Set<Pair<Integer,Integer>> rtn = new HashSet<>();
         for (int i = 0; i < 10; i++) {
@@ -1324,122 +1502,63 @@ public class FitGame {
         return rtn;
     }
 
+    /**
+     * removePiece will remove a specific piece from the given challenge.
+     *
+     * @param challenge a String challenge.
+     * @param pieceToRemove the piece to be removed form the String challenge
+     *
+     * @return the String challenge after removing the specified piece.
+     *  Author: Qinrui Cheng  u7133046.
+     */
     public static String removePiece(String challenge, String pieceToRemove) {
-        String rtn = "";
+        StringBuilder rtn = new StringBuilder();
         for (int i = 0; i < challenge.length(); i += 4) {
             String piece = challenge.substring(i,i+4);
-            if (!piece.equals(pieceToRemove)) rtn += piece;
+            if (!piece.equals(pieceToRemove)) rtn.append(piece);
         }
-        return rtn;
+        return sortStringPlacement(rtn.toString());
     }
 
 
+
+
+    /**
+     * canPut will take a challenge and a piece, check if the piece can be add in the challenge
+     * according to whether the challenge contains pieces with the same shape as the piece, or can be rotated to get the
+     * same shape. Since we know the the solution of a game must be unique, this can't be happened.
+     *
+     * @param challenge a String challenge.
+     * @param piece a piece to be tested.
+     *
+     * @return if the piece won't violate the uniqueness of the solution or not.
+     *  Author: Qinrui Cheng  u7133046.
+     */
     public static boolean canPut(String challenge, String piece) {
-        List<String> colourAndDirList = new ArrayList<>();
+        List<Character> colourList = new ArrayList<>();
         for (int i = 0; i < challenge.length(); i+=4) {
-            colourAndDirList.add(challenge.charAt(i)+""+challenge.charAt(i+3));
+            colourList.add(challenge.charAt(i));
         }
 
-        String direction = piece.charAt(3)+"";
-        String color = piece.charAt(0) +"";
+        char color = piece.charAt(0);
 
         switch (color) {
-            case "b":
-                switch (direction) {
-                    case "N":
-                        return !colourAndDirList.contains("rN");
-                    case "E":
-                        return !colourAndDirList.contains("rE");
-                    case "S":
-                        return !colourAndDirList.contains("rS");
-                    case "W":
-                        return !colourAndDirList.contains("rW");
-                }
-                break;
-            case "r":
-                switch (direction) {
-                    case "N":
-                        return !colourAndDirList.contains("bN");
-                    case "E":
-                        return !colourAndDirList.contains("bE");
-                    case "S":
-                        return !colourAndDirList.contains("bS");
-                    case "W":
-                        return !colourAndDirList.contains("bW");
-                }
-                break;
-            case "o":
-                switch (direction) {
-                    case "N":
-                        return !colourAndDirList.contains("sN");
-                    case "E":
-                        return !colourAndDirList.contains("sE");
-                    case "S":
-                        return !colourAndDirList.contains("sS");
-                    case "W":
-                        return !colourAndDirList.contains("sW");
-                }
-                break;
-            case "s":
-                switch (direction) {
-                    case "N":
-                        return !colourAndDirList.contains("oN");
-                    case "E":
-                        return !colourAndDirList.contains("oE");
-                    case "S":
-                        return !colourAndDirList.contains("oS");
-                    case "W":
-                        return !colourAndDirList.contains("oW");
-                }
-                break;
-            case "L":
-                switch (direction) {
-                    case "N":
-                        return !colourAndDirList.contains("NN");
-                    case "E":
-                        return !colourAndDirList.contains("NE");
-                    case "S":
-                        return !colourAndDirList.contains("NS");
-                    case "W":
-                        return !colourAndDirList.contains("NW");
-                }
-                break;
-            case "N":
-                switch (direction) {
-                    case "N":
-                        return !colourAndDirList.contains("LN");
-                    case "E":
-                        return !colourAndDirList.contains("LE");
-                    case "S":
-                        return !colourAndDirList.contains("LS");
-                    case "W":
-                        return !colourAndDirList.contains("LW");
-                }
-                break;
-            case "g":
-                switch (direction) {
-                    case "N":
-                        return !colourAndDirList.contains("nN");
-                    case "E":
-                        return !colourAndDirList.contains("nE");
-                    case "S":
-                        return !colourAndDirList.contains("nS");
-                    case "W":
-                        return !colourAndDirList.contains("nW");
-                }
-                break;
-            case "n":
-                switch (direction) {
-                    case "N":
-                        return !colourAndDirList.contains("gN");
-                    case "E":
-                        return !colourAndDirList.contains("gE");
-                    case "S":
-                        return !colourAndDirList.contains("gS");
-                    case "W":
-                        return !colourAndDirList.contains("gW");
-                }
-                break;
+            case 'b':
+                return !colourList.contains('r');
+            case 'r':
+                return !colourList.contains('b');
+            case 'o':
+                return !colourList.contains('s');
+            case 's':
+                return !colourList.contains('o');
+            case 'L':
+                return !colourList.contains('N');
+            case 'N':
+                return !colourList.contains('L');
+            case 'g':
+                return !colourList.contains('n');
+            case 'n':
+                return !colourList.contains('g');
         }
 
         return true;
