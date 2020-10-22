@@ -1197,7 +1197,8 @@ public class FitGame {
      *
      * Author: Qinrui Cheng  u7133046.
      */
-    public static void findSolution(gameState startRoot, List<String> pieceTrack, HashMap<String, ArrayList<String>> invalidStates, List<String> result, Combinations combination) {
+    public static void findSolution(gameState startRoot, List<String> pieceTrack, HashMap<String,
+            ArrayList<String>> invalidStates, List<String> result, Combinations combination) {
         var validityOccupation = validityOccupation(startRoot.gameState);
         var emptyLocations = occupationAsSet(validityOccupation.getValue());
 
@@ -1208,13 +1209,17 @@ public class FitGame {
         } else  {
             for (Pair<Integer, Integer> emptyLocation : emptyLocations) {
                 if (!result.isEmpty()) break;
-                var viablePieces = getViablePiecePlacements(startRoot.gameState, emptyLocation.getKey(), emptyLocation.getValue());
+                var viablePieces =
+                        getViablePiecePlacements(startRoot.gameState, emptyLocation.getKey(), emptyLocation.getValue());
+
                 if (viablePieces != null && !viablePieces.isEmpty()) {
                     for (String piece : viablePieces) {
                         if (!result.isEmpty()) break;
 
                         // only put pieces satisfies these conditions
-                        if ((!invalidStates.containsKey(piece) || !invalidStates.get(piece).contains(startRoot.gameState)) && canPut(piece) && correctCombination(combination, startRoot.currentSolution) && canPut(startRoot.currentSolution,piece)) {
+                        if ((!invalidStates.containsKey(piece) || !invalidStates.get(piece).contains(startRoot.gameState))
+                                && canPut(piece) && correctCombination(combination, startRoot.currentSolution)
+                                && canPut(startRoot.currentSolution,piece)) {
 
                             var newGameState = sortStringPlacement(startRoot.gameState + piece);
 
@@ -1354,7 +1359,7 @@ public class FitGame {
      *
      * Author: Qinrui Cheng  u7133046.
      */
-    public static class SortByAverage implements Comparator<Combinations> {
+    public static class SortByDistribution implements Comparator<Combinations> {
 
         @Override
         public int compare(Combinations o1, Combinations o2) {
@@ -1463,7 +1468,7 @@ public class FitGame {
 
 
         // sort the Combinations to improve the possibility of finding the solution.
-        combinations.sort(new SortByAverage());
+        combinations.sort(new SortByDistribution());
 
         int numberOfPieceToPut = 10 - challenge.length()/4;
 
