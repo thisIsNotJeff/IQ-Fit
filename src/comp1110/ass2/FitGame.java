@@ -1523,6 +1523,8 @@ public class FitGame {
 
 
 
+
+
     /**
      * canPut will take a challenge and a piece, check if the piece can be add in the challenge
      * according to whether the challenge contains pieces with the same shape as the piece, or can be rotated to get the
