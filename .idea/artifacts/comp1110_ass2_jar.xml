@@ -16,6 +16,7 @@
       <element id="extracted-dir" path="$PATH_TO_FX$/javafx.controls.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PATH_TO_FX$/javafx.graphics.jar" path-in-jar="/" />
       <element id="library" level="module" name="JavaFX" module-name="comp1110-ass2" />
+      <element id="library" level="project" name="lib" />
     </root>
   </artifact>
 </component>
